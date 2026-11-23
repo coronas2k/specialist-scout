@@ -326,6 +326,31 @@ Script: `benchmarks/experiments/tune_hybrid.py`.
 
 ---
 
+## Run 15: can arctic-embed-xs beat MiniLM once tuned? Cross-validation over 106 queries (2026-11-23)
+
+Five folds, deterministic shuffle. For each fold, the hybrid settings are chosen on the other four
+folds and scored on the held-out fold, so every query is scored by settings that never saw it. The
+default column uses the plugin's fixed settings for reference.
+
+| Model | Default: hit@1 / hit@3 / MRR | Tuned by cross-validation: hit@1 / hit@3 / MRR |
+|---|---|---|
+| MiniLM-L6 (current) | 76 / 91 / 0.80 | 76 / 94 / 0.80 |
+| arctic-embed-xs, with query prefix | 75 / 91 / 0.78 | 76 / 92 / 0.80 |
+| arctic-embed-xs, no query prefix | 75 / 89 / 0.78 | 79 / 89 / 0.80 |
+| Ensemble: arctic-embed-xs and MiniLM (two models) | 75 / 91 / 0.79 | 77 / 95 / 0.81 |
+
+Verdict: arctic-embed-xs does not beat MiniLM. With its prefix it ties on first place and trails by
+two queries in the top three. Without the prefix it is better on first place (79 against 76) and
+worse in the top three (89 against 94), so the prefix trades one for the other. Tuning helps MiniLM
+by three queries in the top three, and the chosen settings were mostly the same across folds
+(min-max fusion, `b` 1.0). The ensemble is the best row, but it needs two models (about 180 MB together).
+
+Limits: the best settings often sit at the edge of the grid (`k1` 1.6 and `b` 1.0), so a wider grid
+might change them. Differences of two or three queries are within noise on 106 queries.
+Script: `benchmarks/experiments/cv_hybrid.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
