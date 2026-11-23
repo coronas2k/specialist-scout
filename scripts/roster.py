@@ -13,9 +13,12 @@ Modes:
   bm25    keyword ranking only. No dependencies beyond the standard library.
   embed   embedding similarity only.
 
-Roster root: $AGENCY_AGENTS_DIR, else ~/.agency-agents.
+Roster root: $AGENCY_AGENTS_DIR, else the roster installed by /agency:setup in the
+plugin data folder, else ~/.agency-agents. The roster is never downloaded here.
 An agent is any .md file inside a division directory (listed in divisions.json)
 whose YAML frontmatter has a `name:` key.
+
+Exit codes: 0 ok, 1 not found, 2 bad usage, 3 roster not installed.
 """
 import hashlib
 import json
@@ -26,11 +29,25 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-SKILL_DIR = Path(__file__).resolve().parent
-ROOT = Path(os.environ.get("AGENCY_AGENTS_DIR", Path.home() / ".agency-agents"))
-VENV_PYTHON = SKILL_DIR / ".venv" / "bin" / "python"
-MODEL_DIR = SKILL_DIR / "model"
-INDEX_PATH = SKILL_DIR / "index.npz"
+PLUGIN_ROOT = Path(__file__).resolve().parent.parent
+# Persistent folder for this plugin (survives plugin updates). Outside Claude, fall back to a cache folder.
+DATA_DIR = Path(os.environ.get("CLAUDE_PLUGIN_DATA") or (Path.home() / ".cache" / "agency-skill"))
+VENV_PYTHON = Path(os.environ.get("AGENCY_VENV") or (DATA_DIR / ".venv")) / "bin" / "python"
+MODEL_DIR = DATA_DIR / "model"
+INDEX_PATH = DATA_DIR / "index.npz"
+
+
+def roster_root():
+    """The roster checkout, or None if none is installed. Never downloads anything."""
+    if os.environ.get("AGENCY_AGENTS_DIR"):
+        return Path(os.environ["AGENCY_AGENTS_DIR"])
+    for candidate in (DATA_DIR / "agency-agents", Path.home() / ".agency-agents"):
+        if (candidate / "divisions.json").exists():
+            return candidate
+    return None
+
+
+ROOT = roster_root()
 # SHA-256 of the files in model/, from onnx-models/all-MiniLM-L6-v2-onnx at the commit in model/REVISION.
 MODEL_FILES = {
     "model.onnx": "994a58868f7abacacbf2192aa0aae8f56da8c4505dbde2740c861b24426ede6b",
@@ -262,6 +279,7 @@ def vector_index(runtime, pool):
         raise EmbeddingUnavailable(f"model files fail their checksum: {bad}; run setup.sh")
     ids = [a["id"] for a in pool]
     vectors = embed(runtime, [embed_text(a) for a in pool])
+    INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
     np.savez(INDEX_PATH, stamp=np.array(stamp), ids=np.array(ids), vectors=vectors)
     return ids, vectors
 
@@ -357,9 +375,9 @@ def main(argv):
         print("model files OK" if not bad else f"checksum mismatch or missing: {bad}")
         return 0 if not bad else 1
 
-    if not (ROOT / "divisions.json").exists():
-        print(f"agency-agents repo not found at {ROOT}", file=sys.stderr)
-        return 1
+    if ROOT is None:
+        print("Agency roster not found. Run /agency:setup roster, or set AGENCY_AGENTS_DIR.", file=sys.stderr)
+        return 3
 
     if cmd == "divisions":
         for div in divisions():

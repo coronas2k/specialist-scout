@@ -78,11 +78,11 @@ search method.
 ## Reproducing
 
 ```bash
-cd ~/.claude/skills/agency
-.venv/bin/python benchmarks/search_eval.py --all          # every set, every mode
-.venv/bin/python benchmarks/search_eval.py holdout2.json --mode hybrid --misses
-.venv/bin/python benchmarks/orchestration_eval.py         # whole-project test
-benchmarks/run_all.sh                                     # everything, saved to benchmarks/results/
+cd <plugin folder>
+$CLAUDE_PLUGIN_DATA/.venv/bin/python benchmarks/search_eval.py --all          # every set, every mode
+$CLAUDE_PLUGIN_DATA/.venv/bin/python benchmarks/search_eval.py holdout2.json --mode hybrid --misses
+$CLAUDE_PLUGIN_DATA/.venv/bin/python benchmarks/orchestration_eval.py   # whole-project test
+benchmarks/run_all.sh                                                 # everything, saved to benchmarks/results/
 ```
 
-Use the skill's venv: embedding modes need it.
+Use the venv created by `/agency:setup embeddings`: embedding modes need it.

@@ -3,7 +3,7 @@ import json, sys
 import pathlib
 SKILL = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(__file__).resolve().parent / 'data'
-sys.path.insert(0, str(SKILL))
+sys.path.insert(0, str(SKILL / 'scripts'))
 import roster
 s = roster.Searcher('hybrid')
 sets = {f: json.load(open(DATA / f)) for f in ['eval.json', 'holdout.json', 'holdout2.json']}

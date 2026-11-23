@@ -15,7 +15,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent          # benchmarks/
 SKILL = HERE.parent
 DATA = HERE / "data"
-sys.path.insert(0, str(SKILL))
+sys.path.insert(0, str(SKILL / 'scripts'))
 import roster  # noqa: E402
 
 

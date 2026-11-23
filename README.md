@@ -1,105 +1,110 @@
-# agency skill
+# Agency plugin for Claude Code
 
-A Claude Code skill that finds a specialist from The Agency roster
-(`~/.agency-agents`, about 280 agents) and runs it as a subagent. Only the
-skill's one-line description sits in context; the roster is searched from
-disk, so unused agents cost nothing.
-
-## Contents
-
-- `SKILL.md`: the instructions Claude follows when you ask for a specialist.
-- `roster.py`: searches the roster. Keyword search (BM25) always works; hybrid search adds embeddings when set up.
-- `benchmarks/`: labelled test queries, scorers and recorded results. See [benchmarks/README.md](benchmarks/README.md) and [docs/search.md](docs/search.md).
-- `setup.sh`, `requirements.txt`, `requirements.lock.txt`: optional embedding setup.
+Find and run specialists from [The Agency](https://github.com/msitarzewski/agency-agents)
+roster (about 280 agents) on demand. Only the specialist you need enters the conversation,
+so the roster doesn't overload context. Nothing is downloaded until you ask.
 
 ## Install
 
-1. Clone the roster:
+In Claude Code:
 
-   ```bash
-   git clone https://github.com/msitarzewski/agency-agents.git ~/.agency-agents
-   ```
+```
+/plugin marketplace add coronas2k/claude-agency-skill
+/plugin install agency@agency-tools
+```
 
-2. Copy the skill into your Claude Code skills folder:
+Then install the roster (asks before downloading):
 
-   ```bash
-   mkdir -p ~/.claude/skills/agency
-   cp -r SKILL.md README.md roster.py setup.sh requirements.txt requirements.lock.txt .gitignore docs benchmarks ~/.claude/skills/agency/
-   ```
+```
+/agency:setup roster
+```
 
-3. Keyword search now works. Run `/reload-skills` or start a new session.
+Optional, for better matching of paraphrased requests (about 275 MB: Python packages and
+a model):
 
-4. Optional: enable hybrid search (about 100 MB of packages plus a 90 MB model):
+```
+/agency:setup embeddings
+```
 
-   ```bash
-   cd ~/.claude/skills/agency && ./setup.sh
-   ```
+Check what is installed at any time with `/agency:setup` (no argument).
 
-   `setup.sh` creates `.venv/`, installs the pinned packages, downloads the
-   embedding model at a fixed Hugging Face commit, and checks each file's
-   SHA-256. Re-running it skips anything already verified.
-
-Set `AGENCY_AGENTS_DIR` if your roster lives somewhere other than `~/.agency-agents`.
+If you already have the roster cloned at `~/.agency-agents`, `/agency:setup roster` uses it
+and downloads nothing.
 
 ## Use
 
-Ask for a specialist by role or name, for example "use an SEO specialist on this
-page". Claude searches the roster with `roster.py`, then runs the best match as a
-subagent.
+Ask for a specialist by role or name:
 
-From the command line:
+- "use an SEO specialist to review this landing page"
+- "get the Reality Checker to judge whether this is production ready"
+- "have a frontend developer build the settings page, and a QA specialist test it"
+
+Claude searches the roster, then runs the best match as a subagent. For a whole project, it
+splits the work into subtasks and runs one specialist per subtask.
+
+You can also search from a terminal:
 
 ```bash
-python3 -I ~/.claude/skills/agency/roster.py divisions
-python3 -I ~/.claude/skills/agency/roster.py search "landing page conversion" --limit 5
-python3 -I ~/.claude/skills/agency/roster.py search seo --division marketing --mode bm25
-python3 -I ~/.claude/skills/agency/roster.py show "Reality Checker"
-python3 -I ~/.claude/skills/agency/roster.py verify-model
+# replace <plugin folder> with the folder Claude Code installed the plugin in
+python3 -I <plugin folder>/scripts/roster.py search "landing page conversion" --limit 5
+python3 -I <plugin folder>/scripts/roster.py show "Reality Checker"
 ```
 
-`--mode` is `hybrid` (default), `bm25` or `embed`. If `.venv/` exists,
-`roster.py` re-runs itself under it, so `python3` always works.
+## What gets installed where
 
-## How search works
-
-1. **Keyword (BM25).** Each agent's name, id, description, division and the first
-   8,000 characters of its body form a weighted document. Queries and documents
-   go through the same light stemming, stopword removal and synonym map (for
-   example "front-end" matches "frontend", and "SEO" matches "search engine
-   optimization"). An agent whose full name appears in the query gets a bonus.
-2. **Embeddings (optional).** `all-MiniLM-L6-v2` (384 dimensions), run through
-   ONNX Runtime on the CPU. The whole roster is embedded once and saved to
-   `index.npz`. The index rebuilds only when an agent file changes or the model
-   checksum changes.
-3. **Hybrid.** Keyword score scaled to 0..1 by the best match, plus the
-   embedding similarity. Equal weights were flat between 0.5 and 2.0.
-
-Accuracy and the comparison of modes are in [docs/search.md](docs/search.md).
-
-## Cost and performance
-
-| | Size on disk | Per search (warm) | Context used |
+| Item | Where | Size | When |
 |---|---|---|---|
-| Keyword only | 0 | about 0.7 s | about 450 tokens of results |
-| Hybrid | about 275 MB (`.venv` 175 MB, model 97 MB, index 0.5 MB) | about 1 s | same |
+| Roster (agency-agents) | `$CLAUDE_PLUGIN_DATA/agency-agents` | about 11 MB | `/agency:setup roster` |
+| Python packages for hybrid search | `$CLAUDE_PLUGIN_DATA/.venv` | about 175 MB | `/agency:setup embeddings` |
+| Embedding model (all-MiniLM-L6-v2, ONNX) | `$CLAUDE_PLUGIN_DATA/model` | 90 MB | `/agency:setup embeddings` |
+| Saved search index | `$CLAUDE_PLUGIN_DATA/index.npz` | 0.5 MB | built on first hybrid search |
 
-Search output is capped by `--limit` (default 8). The embedding model runs
-only in your shell, so it never enters the conversation.
+`$CLAUDE_PLUGIN_DATA` is the plugin's own data folder, which survives plugin updates. Uninstalling
+may leave it behind; check it and delete it by hand if you want the space back.
 
-## Updating
+Downloads come from these sources only:
+- `https://github.com/msitarzewski/agency-agents` (the roster)
+- `https://huggingface.co/onnx-models/all-MiniLM-L6-v2-onnx` (the model, pinned to one commit, each file checked against a SHA-256 hash)
+- the Python package index, for the pinned packages in `scripts/requirements.txt`
 
-- **Roster:** `git -C ~/.agency-agents pull`. Keyword search picks up changes at once. Hybrid rebuilds the index on the next search.
-- **Model:** change the commit in `setup.sh` and the three checksums in `roster.py` together, then run `setup.sh` and `benchmarks/run_all.sh`.
-- **Packages:** change `requirements.txt`, regenerate `requirements.lock.txt` with `.venv/bin/python -m pip freeze`, and re-run the eval.
+## Context cost
+
+- Always loaded: the skill's one-line description. The search results are added only when you ask for a specialist, about 450 tokens.
+- Not shipped: the 282 agent definitions. They stay on disk until searched.
+- Hooks: none. The plugin doesn't run anything at session start.
+
+## Search modes
+
+- `hybrid` (default when `/agency:setup embeddings` has been run): keyword and embedding scores combined.
+- `bm25`: keyword matching only. Needs nothing beyond the roster.
+
+The first hybrid search after setup builds the index, which takes a few seconds.
+
+## Accuracy
+
+Measured on labelled query sets (see `benchmarks/`). On the clean holdout set, hybrid finds
+the right specialist in the top 3 for 90% of requests (80% in first place). For whole
+projects, search one subtask at a time; a single search for a full project covers under
+40% of the roles needed. Details in `docs/search.md` and `benchmarks/results/RESULTS.md`.
 
 ## Troubleshooting
 
-- **"note: keyword search only" on stderr.** The venv, model or checksum isn't in place. Run `./setup.sh`, then `roster.py verify-model`.
-- **Checksum mismatch.** Delete `model/`, then run `./setup.sh` again.
-- **Search seems stale after an edit.** Agent files are indexed by modification time. Touch the file or re-run the search to rebuild.
-- **Results missing one specialist.** Try `--mode bm25 --limit 20` to see what keyword matching returns, or name the specialist directly with `show`.
+- **"Agency roster not found"** (exit code 3): run `/agency:setup roster`, or set `AGENCY_AGENTS_DIR`.
+- **"keyword search only" note**: the embedding setup is missing. Run `/agency:setup embeddings`, or ignore it; keyword search still works.
+- **Checksum mismatch during setup**: nothing is installed. Run the same setup step again; if it fails twice, the upstream file changed and the pin needs updating.
+- **Search seems stale**: the index rebuilds when an agent file changes. Re-run the search.
 
-## Licence and provenance
+## Development
 
-- The Agency roster is from [msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents).
-- The embedding model is [onnx-models/all-MiniLM-L6-v2-onnx](https://huggingface.co/onnx-models/all-MiniLM-L6-v2-onnx), an ONNX export of [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2). The ONNX repo has no licence tag; confirm the upstream terms before commercial use.
+```bash
+benchmarks/run_all.sh       # every benchmark, saved to benchmarks/results/
+```
+
+The plugin layout: `.claude-plugin/` (manifests), `skills/agency/SKILL.md`, `commands/setup.md`,
+`scripts/` (roster search, setup, pinned requirements), `benchmarks/`, `docs/`.
+
+## Licence
+
+The plugin's own licence is not set yet. The roster is MIT-licensed by its authors. The
+embedding model is an ONNX export of `sentence-transformers/all-MiniLM-L6-v2`; check its
+terms before commercial use.
