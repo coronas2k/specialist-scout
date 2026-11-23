@@ -421,6 +421,8 @@ Script: `benchmarks/experiments/shared_setting_test.py`. Data: `benchmarks/data/
 
 ## Run 18: tuning the MiniLM hybrid further, with a second fresh set (2026-11-23)
 
+> Update: Run 19 (pre-registered, third fresh set) did not support the name-view finding below. See Run 19.
+
 Adds two things the earlier grids did not cover: separate field weights for the keyword side (name 3 or
 5, description 2 or 3), and three embedding views per agent (full text, name only, description only),
 combined per query as the full view, the average of full and name, the average of full and description,
@@ -545,9 +547,11 @@ MiniLM settings. No second vector set is added.
 
 What this means for the lead. Run 18's gain on fresh2 (one more first place, three more in the top
 three) did not appear on fresh3, where the two settings tie on first place and differ by one in the top
-three. The name view does not help plain queries: alone it slightly lowers MRR there, and that
-interval excludes zero. The rule-3 result was not a pre-registered primary test, so treat the negative
-name-view estimate as exploratory. The pooled gains of about 0.02 MRR are within noise.
+three. There is no sign that the name view helps plain queries. Alone it changes the rank of 24 of the 48
+plain queries, but only 5 of those changes move MRR: one query improves and four get worse. The
+−0.007 estimate rests on those five queries, so its interval is not strong evidence. Rule 3 was not a
+pre-registered primary test, so treat the negative estimate as exploratory. The pooled gains of about
+0.02 MRR are within noise.
 
 Caveats: the sets are 40 queries each, and the labels are mine. Name overlap is a crude proxy for
 role-named queries, and the plain stratum has only 48 queries. The name-view effect on plain queries
