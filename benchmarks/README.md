@@ -7,6 +7,8 @@ Measures how well `roster.py` finds the right Agency specialists. Two kinds of t
 
 Plus `fusion_experiment.py`, which compares ways of combining keyword and embedding scores.
 
+`picker_eval.py` scores a subagent picker (a model that reads the roster list and chooses specialists) against hybrid search on four new workflows in `data/workflows.json`. It reads the saved picker output in `results/picker-<date>.json`. Each picker call costs about 92,000 tokens, so it is not part of `run_all.sh`.
+
 Full history, every number and every change is in [results/RESULTS.md](results/RESULTS.md).
 
 ## Layout

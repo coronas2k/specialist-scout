@@ -1,0 +1,56 @@
+[
+ {
+  "workflow": "oss-library-release",
+  "prompt": "Release an open-source Python library: documentation, versioning and changelog, CI, dependency audit, tests, review of outside contributions, API decisions and the launch announcement.",
+  "subtasks": [
+   {"query": "write the README and usage documentation for a Python library", "expect": ["engineering-technical-writer"]},
+   {"query": "set up semantic versioning, changelog and release notes", "expect": ["engineering-git-workflow-master"]},
+   {"query": "GitHub Actions CI that runs tests and builds packages", "expect": ["engineering-devops-automator"]},
+   {"query": "review pull requests from outside contributors", "expect": ["engineering-code-reviewer"]},
+   {"query": "audit the dependencies for known vulnerabilities", "expect": ["security-appsec-engineer"]},
+   {"query": "unit tests and coverage for the public API", "expect": ["testing-test-automation-engineer"]},
+   {"query": "decide the public API surface and deprecation policy", "expect": ["engineering-api-platform-engineer"]},
+   {"query": "announce the release on social media and in a newsletter", "expect": ["marketing-content-creator"]}
+  ]
+ },
+ {
+  "workflow": "sales-kpi-dashboard",
+  "prompt": "Build a sales KPI dashboard for leadership: define the metrics, pull CRM data into a warehouse, write the queries, forecast next quarter, find rep-level coaching opportunities and summarise the findings.",
+  "subtasks": [
+   {"query": "define the sales KPIs and their formulas", "expect": ["sales-pipeline-analyst"]},
+   {"query": "build the data pipeline from the CRM into a warehouse", "expect": ["engineering-data-engineer"]},
+   {"query": "design the dashboard layout and charts for executives", "expect": ["engineering-data-visualization-engineer"]},
+   {"query": "forecast next quarter revenue from pipeline data", "expect": ["finance-fpa-analyst"]},
+   {"query": "SQL queries for win rate and sales cycle time", "expect": ["engineering-database-optimizer"]},
+   {"query": "find rep-level performance outliers and coaching opportunities", "expect": ["sales-coach"]},
+   {"query": "one-page summary of findings for the leadership team", "expect": ["support-executive-summary-generator"]}
+  ]
+ },
+ {
+  "workflow": "healthcare-booking-app",
+  "prompt": "Build a patient appointment booking app for a clinic group: clinical rules, HIPAA review, accessible mobile and web screens, scheduling backend, patient messages, user research and compliant marketing copy.",
+  "subtasks": [
+   {"query": "clinical evidence review for the triage rules", "expect": ["healthcare-clinical-evidence-agent"]},
+   {"query": "HIPAA and patient privacy compliance review", "expect": ["engineering-privacy-engineer", "security-compliance-auditor"]},
+   {"query": "accessible booking screens for patients with disabilities", "expect": ["testing-accessibility-auditor"]},
+   {"query": "mobile app for patients on iOS and Android", "expect": ["engineering-mobile-app-builder"]},
+   {"query": "scheduling backend with provider availability", "expect": ["engineering-backend-architect"]},
+   {"query": "appointment reminder and patient support messages", "expect": ["healthcare-customer-service"]},
+   {"query": "user interviews with patients and clinic staff", "expect": ["design-ux-researcher"]},
+   {"query": "marketing claims compliance for the clinic website", "expect": ["healthcare-marketing-compliance"]}
+  ]
+ },
+ {
+  "workflow": "saas-support-chatbot",
+  "prompt": "Build a customer support chatbot for a SaaS product: retrieval over help articles, prompt and tool design, evaluation, human escalation, knowledge graph of features, cost monitoring and red-team testing.",
+  "subtasks": [
+   {"query": "retrieval pipeline over the help center articles", "expect": ["engineering-rag-pipeline-engineer"]},
+   {"query": "write and tune the chatbot system prompt and tool instructions", "expect": ["engineering-prompt-engineer"]},
+   {"query": "evaluate chatbot answer quality with a test set", "expect": ["specialized-model-qa"]},
+   {"query": "escalation rules and handoff to human agents", "expect": ["support-support-responder"]},
+   {"query": "knowledge graph of product features and their relationships", "expect": ["engineering-knowledge-graph-engineer"]},
+   {"query": "monitor the cost and latency of model calls in production", "expect": ["engineering-finops-engineer"]},
+   {"query": "red-team the chatbot for prompt injection", "expect": ["security-penetration-tester"]}
+  ]
+ }
+]

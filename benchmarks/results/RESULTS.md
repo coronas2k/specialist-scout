@@ -184,6 +184,47 @@ Python 3.14 and removes a failed virtualenv rather than leaving it behind.
 
 ---
 
+## Run 8: subagent picker on four new workflows (2026-11-23)
+
+Four workflows that the earlier sets did not cover (`benchmarks/data/workflows.json`): an
+open-source library release, a sales KPI dashboard, a healthcare booking app and a SaaS support
+chatbot. Labels were written before any search or picker ran. Each workflow was given to one
+subagent (the picker), which read the roster list and returned three specialists per subtask. Raw
+picker output is saved as returned in `benchmarks/results/picker-2026-11-23.json`.
+
+| Workflow | Hybrid hit@1 | Hybrid hit@3 | Picker hit@1 | Picker hit@3 | Invalid picks |
+|---|---|---|---|---|---|
+| OSS library release (8) | 25% | 50% | 75% | 88% | 0 |
+| Sales KPI dashboard (7) | 29% | 86% | 0%* | 0%* | 21 |
+| Healthcare booking app (8) | 75% | 75% | 88% | 100% | 0 |
+| SaaS support chatbot (7) | 43% | 57% | 86% | 100% | 0 |
+| All (30) | 43% | 67% | 63% | 73% | 21 |
+
+\* The sales picker returned 1-based line numbers from the roster list instead of agent ids. The
+scorer counts those as invalid, so the strict result above is 0%. Diagnostic only: mapping the
+numbers to the lines they index gives picker hit@1 6 of 7 and hit@3 7 of 7, with 15 distinct
+specialists. That mapping is not part of the scored result.
+
+On the 23 subtasks where every pick was a valid id, the difference is clear:
+
+| Method | hit@1 | hit@3 |
+|---|---|---|
+| Hybrid search | 11 of 23 (48%) | 14 of 23 (61%) |
+| Picker | 19 of 23 (83%) | 22 of 23 (96%) |
+
+Cost: the harness reported about 92,000 tokens for each picker call (about 369,000 across the four).
+Hybrid search costs about 450 tokens of results per query and no model call. The picker reads the
+roster list, so it is far more expensive per lookup, and it runs in a subagent.
+
+Team size: the picker's three picks per subtask gave 15 to 24 distinct specialists per workflow.
+A lead agent would normally take only the top pick, which is right on 19 of 23 valid subtasks.
+
+Read the result as a trade-off, not a verdict. Hybrid search is cheap and fails on paraphrases;
+the picker is accurate on paraphrases and costs a model call per workflow. A lead agent can decide
+on the picker for planning and keep hybrid search for quick lookups.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.

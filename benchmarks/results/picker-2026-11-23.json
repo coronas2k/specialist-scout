@@ -1,0 +1,160 @@
+{
+ "oss-library-release": {
+  "1": [
+   "engineering-technical-writer",
+   "product-dx-engineer",
+   "specialized-developer-advocate"
+  ],
+  "2": [
+   "engineering-git-workflow-master",
+   "engineering-technical-writer",
+   "engineering-api-platform-engineer"
+  ],
+  "3": [
+   "engineering-devops-automator",
+   "engineering-platform-engineer",
+   "engineering-developer-tooling-engineer"
+  ],
+  "4": [
+   "engineering-code-reviewer",
+   "engineering-minimal-change-engineer",
+   "security-senior-secops"
+  ],
+  "5": [
+   "security-appsec-engineer",
+   "security-senior-secops",
+   "engineering-devops-automator"
+  ],
+  "6": [
+   "testing-api-tester",
+   "testing-test-results-analyzer",
+   "testing-reality-checker"
+  ],
+  "7": [
+   "engineering-api-platform-engineer",
+   "engineering-software-architect",
+   "product-manager"
+  ],
+  "8": [
+   "marketing-social-media-strategist",
+   "marketing-email-strategist",
+   "marketing-content-creator"
+  ]
+ },
+ "sales-kpi-dashboard": {
+  "1": [
+   "189",
+   "268",
+   "84"
+  ],
+  "2": [
+   "27",
+   "22",
+   "33"
+  ],
+  "3": [
+   "28",
+   "11",
+   "13"
+  ],
+  "4": [
+   "84",
+   "83",
+   "189"
+  ],
+  "5": [
+   "27",
+   "29",
+   "189"
+  ],
+  "6": [
+   "183",
+   "189",
+   "6"
+  ],
+  "7": [
+   "269",
+   "248",
+   "268"
+  ]
+ },
+ "healthcare-booking-app": {
+  "1": [
+   "healthcare-clinical-evidence-agent",
+   "research-synthesist",
+   "academic-statistician"
+  ],
+  "2": [
+   "security-compliance-auditor",
+   "data-privacy-officer",
+   "engineering-privacy-engineer"
+  ],
+  "3": [
+   "testing-accessibility-auditor",
+   "engineering-section-508-specialist",
+   "design-ui-designer"
+  ],
+  "4": [
+   "engineering-mobile-app-builder",
+   "engineering-frontend-developer",
+   "engineering-mobile-release-engineer"
+  ],
+  "5": [
+   "engineering-backend-architect",
+   "engineering-software-architect",
+   "engineering-database-optimizer"
+  ],
+  "6": [
+   "healthcare-customer-service",
+   "marketing-email-strategist",
+   "customer-service"
+  ],
+  "7": [
+   "design-ux-researcher",
+   "organizational-psychologist",
+   "product-feedback-synthesizer"
+  ],
+  "8": [
+   "support-legal-compliance-checker",
+   "healthcare-marketing-compliance",
+   "marketing-content-creator"
+  ]
+ },
+ "saas-support-chatbot": {
+  "1": [
+   "engineering-rag-pipeline-engineer",
+   "engineering-search-relevance-engineer",
+   "engineering-ai-engineer"
+  ],
+  "2": [
+   "engineering-prompt-engineer",
+   "engineering-ai-engineer",
+   "specialized-mcp-builder"
+  ],
+  "3": [
+   "specialized-model-qa",
+   "engineering-prompt-engineer",
+   "academic-statistician"
+  ],
+  "4": [
+   "customer-service",
+   "support-support-responder",
+   "specialized-workflow-architect"
+  ],
+  "5": [
+   "engineering-knowledge-graph-engineer",
+   "engineering-software-architect",
+   "product-manager"
+  ],
+  "6": [
+   "engineering-finops-engineer",
+   "engineering-sre",
+   "testing-performance-benchmarker"
+  ],
+  "7": [
+   "security-penetration-tester",
+   "security-ai-generated-code-auditor",
+   "security-appsec-engineer"
+  ]
+ }
+}
