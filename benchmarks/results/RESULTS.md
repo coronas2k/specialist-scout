@@ -232,9 +232,9 @@ right specialist in the top three on 20 of 30 workflow subtasks; keyword search 
 found 17 each. The misses were mostly paraphrases (for example "review pull requests" for the code
 reviewer, and "cost and latency of model calls" for FinOps).
 
-Text embedded for each specialist (hybrid only, current model, all query sets: 106 queries):
+Text embedded for each specialist (hybrid only, current model, all query sets: counts out of 106 queries):
 
-| Text | hit@1 | hit@3 |
+| Text | hit@1 (of 106) | hit@3 (of 106) |
 |---|---|---|
 | name, description, vibe (current) | 76 | 91 |
 | name and description | 76 | 90 |
@@ -256,7 +256,8 @@ Embedding model (all 106 queries; bge-small-en-v1.5 is MIT, ONNX from its own re
 | bge-small with query prefix | hybrid | 71% | 86% |
 
 bge-small is marginally better on its own but makes no difference to hybrid search, so it is not
-worth a 133 MB download and a change to the setup. Scripts: `benchmarks/experiments/text_variants.py`
+worth a 133 MB download and a change to the setup. The reasons are in
+`benchmarks/results/DECISION-keep-minilm.md`. Scripts: `benchmarks/experiments/text_variants.py`
 and `benchmarks/experiments/bge_compare.py`.
 
 Still open: a cross-encoder reranker (bge-reranker-base is MIT, but its ONNX file is 1.1 GB) reads the
