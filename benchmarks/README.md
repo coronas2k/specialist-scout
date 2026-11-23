@@ -31,6 +31,8 @@ benchmarks/
     fresh3.json             40 queries, held out (used in Run 19; labels committed before any run)
   experiments/              one-off tests on branches; each has a docstring with its usage
     prereg_lead.py          pre-registered 2x2 test of the name-view lead (Run 19)
+    rerank_eval.py          cross-encoder reranking of the hybrid's top 15 (Run 12)
+    colbert_core.py, colbert_eval.py   late-interaction (ColBERT) encoder and comparison (Runs 10 and 11)
     minilm_tuning.py        expanded MiniLM tuning (Run 18)
     shared_setting_test.py  one shared setting for two models, paired tests (Run 17)
     cv_hybrid.py, cv_hybrid_wide.py   cross-validated tuning, narrow and wide grids (Runs 15 and 16)
@@ -40,6 +42,8 @@ benchmarks/
   results/
     RESULTS.md              history of every run
     DECISION-keep-minilm.md why the current model and text were kept
+    DECISION-no-reranker.md why no cross-encoder reranker was adopted (Run 12)
+    DECISION-no-late-interaction.md why late interaction was not adopted (Runs 10 and 11)
     <date>-run.txt          raw output of run_all.sh
     prereg-2026-11-23.txt   raw output of the pre-registered test (Run 19)
     picker-2026-11-23.json  subagent picker output, as returned (Run 8)
