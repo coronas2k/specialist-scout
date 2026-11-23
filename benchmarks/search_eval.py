@@ -1,9 +1,9 @@
 """Score roster search against labelled query sets.
 
-Usage (run with the skill's venv so embedding modes work):
-  .venv/bin/python eval.py                      # tuning set, all modes
-  .venv/bin/python eval.py holdout2.json --mode hybrid
-  .venv/bin/python eval.py --all                # every set, every mode
+Usage (run from the skill folder with its venv so embedding modes work):
+  .venv/bin/python benchmarks/search_eval.py                      # tuning set, hybrid
+  .venv/bin/python benchmarks/search_eval.py holdout2.json --mode bm25
+  .venv/bin/python benchmarks/search_eval.py --all                # every set, every mode
 Reports hit@1, hit@3, MRR and the average output size per search (a proxy for context cost).
 """
 import argparse
@@ -11,15 +11,17 @@ import json
 import pathlib
 import sys
 
-HERE = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+HERE = pathlib.Path(__file__).resolve().parent          # benchmarks/
+SKILL = HERE.parent                                       # the skill folder
+DATA = HERE / "data"
+sys.path.insert(0, str(SKILL))
 import roster  # noqa: E402
 
 SETS = ["eval.json", "holdout.json", "holdout2.json"]
 
 
 def run(path, mode, searcher):
-    cases = json.loads((HERE / path).read_text(encoding="utf-8"))
+    cases = json.loads((DATA / path).read_text(encoding="utf-8"))
     hit1 = hit3 = 0
     mrr = 0.0
     chars = 0

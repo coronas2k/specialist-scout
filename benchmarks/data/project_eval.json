@@ -1,0 +1,57 @@
+[
+ {
+  "project": "saas-invoicing",
+  "prompt": "Build a web app that lets freelancers create, send and track invoices and accept card payments. Take it from requirements through design, backend, frontend, payments, testing, security, privacy, deployment, documentation and launch.",
+  "subtasks": [
+   {"query": "gather requirements and write user stories for invoicing", "expect": ["product-manager", "project-management-project-shepherd"]},
+   {"query": "user research interviews with freelancers", "expect": ["design-ux-researcher"]},
+   {"query": "wireframes and information architecture for the invoice editor", "expect": ["design-ux-architect"]},
+   {"query": "visual UI design of the dashboard", "expect": ["design-ui-designer"]},
+   {"query": "backend API design and service architecture", "expect": ["engineering-backend-architect", "engineering-software-architect", "engineering-api-platform-engineer"]},
+   {"query": "database schema for invoices and payments with query tuning", "expect": ["engineering-database-optimizer", "engineering-data-engineer"]},
+   {"query": "build the React frontend", "expect": ["engineering-frontend-developer"]},
+   {"query": "integrate Stripe card payments and billing", "expect": ["engineering-payments-billing-engineer"]},
+   {"query": "automated unit and end-to-end tests", "expect": ["testing-test-automation-engineer"]},
+   {"query": "security penetration test of the web app", "expect": ["security-penetration-tester", "security-appsec-engineer"]},
+   {"query": "GDPR privacy review of customer data", "expect": ["engineering-privacy-engineer", "data-privacy-officer"]},
+   {"query": "CI/CD pipeline and cloud deployment", "expect": ["engineering-devops-automator", "engineering-platform-engineer"]},
+   {"query": "monitoring, reliability and on-call incident response", "expect": ["engineering-sre", "engineering-incident-response-commander"]},
+   {"query": "user documentation and help center articles", "expect": ["engineering-technical-writer"]},
+   {"query": "launch marketing campaign and content", "expect": ["marketing-growth-hacker", "marketing-content-creator", "marketing-social-media-strategist"]}
+  ]
+ },
+ {
+  "project": "mobile-fitness-app",
+  "prompt": "Launch a mobile fitness tracking app on iOS and Android, from market research and app store listing through to release, test automation, privacy review and ongoing feedback.",
+  "subtasks": [
+   {"query": "market research on fitness app trends and competitors", "expect": ["product-trend-researcher", "research-synthesist"]},
+   {"query": "analyze app store reviews and user feedback themes", "expect": ["product-feedback-synthesizer"]},
+   {"query": "UI screens for workout tracking", "expect": ["design-ui-designer"]},
+   {"query": "build the cross-platform mobile app", "expect": ["engineering-mobile-app-builder"]},
+   {"query": "mobile app release to App Store and Play Console", "expect": ["engineering-mobile-release-engineer"]},
+   {"query": "app store listing keywords and screenshot optimization", "expect": ["marketing-app-store-optimizer"]},
+   {"query": "mobile app test automation on real devices", "expect": ["testing-test-automation-engineer"]},
+   {"query": "backend sync API for workouts and user accounts", "expect": ["engineering-backend-architect", "engineering-api-platform-engineer"]},
+   {"query": "privacy compliance for health data", "expect": ["engineering-privacy-engineer", "data-privacy-officer"]},
+   {"query": "prioritize the feature backlog for the next sprint", "expect": ["product-sprint-prioritizer"]},
+   {"query": "launch announcement social posts and content", "expect": ["marketing-social-media-strategist", "marketing-content-creator"]}
+  ]
+ },
+ {
+  "project": "unity-multiplayer-racer",
+  "prompt": "Make a small multiplayer 3D racing game in Unity, from game design and track layouts through networking, shaders, audio, economy and a playable release.",
+  "subtasks": [
+   {"query": "core game design and gameplay loop", "expect": ["game-designer"]},
+   {"query": "level layout and race track design", "expect": ["level-designer"]},
+   {"query": "story and narrative for the single player campaign", "expect": ["narrative-designer"]},
+   {"query": "Unity multiplayer networking and matchmaking", "expect": ["unity-multiplayer-engineer"]},
+   {"query": "custom shaders for car paint and water", "expect": ["unity-shader-graph-artist"]},
+   {"query": "technical art pipeline and asset optimization", "expect": ["technical-artist"]},
+   {"query": "game sound effects and music implementation", "expect": ["game-audio-engineer"]},
+   {"query": "in-game economy and progression balancing", "expect": ["economy-designer"]},
+   {"query": "Unity editor tooling for level designers", "expect": ["unity-editor-tool-developer"]},
+   {"query": "game system architecture and code structure", "expect": ["unity-architect"]},
+   {"query": "playtest feedback analysis", "expect": ["product-feedback-synthesizer"]}
+  ]
+ }
+]

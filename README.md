@@ -9,7 +9,7 @@ disk, so unused agents cost nothing.
 
 - `SKILL.md`: the instructions Claude follows when you ask for a specialist.
 - `roster.py`: searches the roster. Keyword search (BM25) always works; hybrid search adds embeddings when set up.
-- `eval.py` and `eval.json`, `holdout.json`, `holdout2.json`: the labelled test queries and scorer. See [docs/search.md](docs/search.md).
+- `benchmarks/`: labelled test queries, scorers and recorded results. See [benchmarks/README.md](benchmarks/README.md) and [docs/search.md](docs/search.md).
 - `setup.sh`, `requirements.txt`, `requirements.lock.txt`: optional embedding setup.
 
 ## Install
@@ -24,9 +24,7 @@ disk, so unused agents cost nothing.
 
    ```bash
    mkdir -p ~/.claude/skills/agency
-   cp SKILL.md README.md roster.py eval.py eval.json holdout.json holdout2.json \
-      setup.sh requirements.txt requirements.lock.txt .gitignore ~/.claude/skills/agency/
-   mkdir -p ~/.claude/skills/agency/docs && cp docs/search.md ~/.claude/skills/agency/docs/
+   cp -r SKILL.md README.md roster.py setup.sh requirements.txt requirements.lock.txt .gitignore docs benchmarks ~/.claude/skills/agency/
    ```
 
 3. Keyword search now works. Run `/reload-skills` or start a new session.
@@ -91,7 +89,7 @@ only in your shell, so it never enters the conversation.
 ## Updating
 
 - **Roster:** `git -C ~/.agency-agents pull`. Keyword search picks up changes at once. Hybrid rebuilds the index on the next search.
-- **Model:** change the commit in `setup.sh` and the three checksums in `roster.py` together, then run `setup.sh` and `eval.py --all`.
+- **Model:** change the commit in `setup.sh` and the three checksums in `roster.py` together, then run `setup.sh` and `benchmarks/run_all.sh`.
 - **Packages:** change `requirements.txt`, regenerate `requirements.lock.txt` with `.venv/bin/python -m pip freeze`, and re-run the eval.
 
 ## Troubleshooting

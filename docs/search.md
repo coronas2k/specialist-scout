@@ -1,15 +1,16 @@
 # Search evaluation
 
 How `roster.py` ranks agents, how well it does, and what was tried. Numbers come
-from `eval.py` on three labelled query sets.
+from `benchmarks/search_eval.py` on three labelled query sets. Every run is recorded in
+[benchmarks/results/RESULTS.md](../benchmarks/results/RESULTS.md).
 
 ## Query sets
 
 | File | Queries | Used for | Notes |
 |---|---|---|---|
-| `eval.json` | 31 | Tuning | Synonyms and weights were chosen against these. Scores are optimistic. |
-| `holdout.json` | 25 | Partly tuning | Written before any change. Four misses were then fixed with general synonyms and the name bonus, so scores are optimistic. |
-| `holdout2.json` | 20 | Clean check | Written before any change. Only its label was corrected (a nonexistent id was removed). Use this set for the honest number. |
+| `benchmarks/data/eval.json` | 31 | Tuning | Synonyms and weights were chosen against these. Scores are optimistic. |
+| `benchmarks/data/holdout.json` | 25 | Partly tuning | Written before any change. Four misses were then fixed with general synonyms and the name bonus, so scores are optimistic. |
+| `benchmarks/data/holdout2.json` | 20 | Clean check | Written before any change. Only its label was corrected (a nonexistent id was removed). Use this set for the honest number. |
 
 Each query lists the agents that would be a good answer. A hit at rank *k* means
 one of them is in the top *k*. MRR is the mean of 1/rank, with 0 for a miss.
@@ -78,8 +79,10 @@ search method.
 
 ```bash
 cd ~/.claude/skills/agency
-.venv/bin/python eval.py --all          # every set, every mode
-.venv/bin/python eval.py holdout2.json --mode hybrid --misses
+.venv/bin/python benchmarks/search_eval.py --all          # every set, every mode
+.venv/bin/python benchmarks/search_eval.py holdout2.json --mode hybrid --misses
+.venv/bin/python benchmarks/orchestration_eval.py         # whole-project test
+benchmarks/run_all.sh                                     # everything, saved to benchmarks/results/
 ```
 
 Use the skill's venv: embedding modes need it.

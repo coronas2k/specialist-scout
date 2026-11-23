@@ -1,0 +1,32 @@
+# search (keyword, embeddings, hybrid) on eval, holdout and holdout2
+eval.json        bm25    n=31  hit@1  87%  hit@3 100%  MRR 0.92  avg output 1809 chars
+holdout.json     bm25    n=25  hit@1  72%  hit@3  88%  MRR 0.80  avg output 1783 chars
+holdout2.json    bm25    n=20  hit@1  80%  hit@3  90%  MRR 0.85  avg output 1829 chars
+eval.json        embed   n=31  hit@1  77%  hit@3  90%  MRR 0.85  avg output 1817 chars
+holdout.json     embed   n=25  hit@1  64%  hit@3  80%  MRR 0.73  avg output 1811 chars
+holdout2.json    embed   n=20  hit@1  65%  hit@3  85%  MRR 0.72  avg output 1833 chars
+eval.json        hybrid  n=31  hit@1  87%  hit@3 100%  MRR 0.93  avg output 1816 chars
+holdout.json     hybrid  n=25  hit@1  80%  hit@3  88%  MRR 0.85  avg output 1786 chars
+holdout2.json    hybrid  n=20  hit@1  80%  hit@3  90%  MRR 0.85  avg output 1833 chars
+
+# orchestration (3 projects, 37 subtasks)
+bm25    whole-prompt coverage 39% [0.27, 0.36, 0.55]  subtask hit@1 68% hit@3 86%  team size 29.3  chars/search 669
+        saas-invoicing         whole-prompt cov 27%   subtask hit@3 80%   team 40
+        mobile-fitness-app     whole-prompt cov 36%   subtask hit@3 91%   team 25
+        unity-multiplayer-racer whole-prompt cov 55%   subtask hit@3 91%   team 23
+embed   whole-prompt coverage 23% [0.07, 0.27, 0.36]  subtask hit@1 68% hit@3 81%  team size 29.3  chars/search 675
+        saas-invoicing         whole-prompt cov 7%   subtask hit@3 67%   team 39
+        mobile-fitness-app     whole-prompt cov 27%   subtask hit@3 91%   team 25
+        unity-multiplayer-racer whole-prompt cov 36%   subtask hit@3 91%   team 24
+hybrid  whole-prompt coverage 36% [0.27, 0.27, 0.55]  subtask hit@1 70% hit@3 89%  team size 28.0  chars/search 673
+        saas-invoicing         whole-prompt cov 27%   subtask hit@3 80%   team 38
+        mobile-fitness-app     whole-prompt cov 27%   subtask hit@3 100%   team 24
+        unity-multiplayer-racer whole-prompt cov 55%   subtask hit@3 91%   team 22
+
+# fusion weightings (76 queries combined)
+bm25 only       hit@3 by set 100% /  88% /  90%   ALL: hit@1 80% hit@3 93% MRR 0.86
+rrf w_emb=1.0   hit@3 by set  97% /  88% /  85%   ALL: hit@1 75% hit@3 91% MRR 0.83
+rrf w_emb=0.5   hit@3 by set  97% /  88% /  85%   ALL: hit@1 78% hit@3 91% MRR 0.84
+linear a=0.5    hit@3 by set 100% /  88% /  90%   ALL: hit@1 83% hit@3 93% MRR 0.88
+linear a=1.0    hit@3 by set 100% /  88% /  90%   ALL: hit@1 83% hit@3 93% MRR 0.88
+linear a=2.0    hit@3 by set 100% /  88% /  90%   ALL: hit@1 82% hit@3 93% MRR 0.88
