@@ -80,6 +80,8 @@ Downloads come from these sources only:
 - Not shipped: the 282 agent definitions. They stay on disk until searched.
 - Hooks: none. The plugin doesn't run anything at session start.
 
+Measurements, the method and what is still estimated: [docs/CONTEXT-COST.md](docs/CONTEXT-COST.md).
+
 ## Search modes
 
 - `hybrid` (default when `/specialist-scout:setup embeddings` has been run): keyword and embedding scores combined.
