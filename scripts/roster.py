@@ -18,7 +18,8 @@ plugin data folder, else ~/.agency-agents. The roster is never downloaded here.
 An agent is any .md file inside a division directory (listed in divisions.json)
 whose YAML frontmatter has a `name:` key.
 
-Exit codes: 0 ok, 1 not found, 2 bad usage, 3 roster not installed.
+Exit codes: 0 ok, 1 not found, 2 bad usage, 3 roster not installed,
+4 embedding search unavailable (mode embed only; hybrid falls back to bm25).
 """
 import hashlib
 import json
@@ -40,7 +41,9 @@ INDEX_PATH = DATA_DIR / "index.npz"
 def roster_root():
     """The roster checkout, or None if none is installed. Never downloads anything."""
     if os.environ.get("AGENCY_AGENTS_DIR"):
-        return Path(os.environ["AGENCY_AGENTS_DIR"])
+        # An explicit path is taken as given; if it isn't a roster, report that instead of guessing.
+        explicit = Path(os.environ["AGENCY_AGENTS_DIR"])
+        return explicit if (explicit / "divisions.json").exists() else None
     for candidate in (DATA_DIR / "agency-agents", Path.home() / ".agency-agents"):
         if (candidate / "divisions.json").exists():
             return candidate
@@ -48,11 +51,11 @@ def roster_root():
 
 
 ROOT = roster_root()
-# SHA-256 of the files in model/, from onnx-models/all-MiniLM-L6-v2-onnx at the commit in model/REVISION.
+# SHA-256 of the files in model/, from sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0) at the
+# commit in model/REVISION. model.onnx is the upstream file at onnx/model.onnx.
 MODEL_FILES = {
-    "model.onnx": "994a58868f7abacacbf2192aa0aae8f56da8c4505dbde2740c861b24426ede6b",
-    "tokenizer.json": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0",
-    "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+    "model.onnx": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+    "tokenizer.json": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
 }
 EMBED_MAX_TOKENS = 256
 EMBED_BATCH = 32
@@ -231,7 +234,11 @@ def load_runtime():
 
 
 def embed(runtime, texts):
-    """L2-normalised sentence embeddings, one row per text."""
+    """L2-normalised sentence embeddings, one row per text.
+
+    Same pipeline as the upstream sentence-transformers model: the ONNX graph returns
+    token vectors (last_hidden_state), then mean pooling over non-padding tokens, then L2 normalisation.
+    """
     np, tok, sess = runtime["np"], runtime["tok"], runtime["sess"]
     chunks = []
     for start in range(0, len(texts), EMBED_BATCH):
@@ -241,7 +248,9 @@ def embed(runtime, texts):
             "attention_mask": np.array([e.attention_mask for e in enc], dtype=np.int64),
             "token_type_ids": np.array([e.type_ids for e in enc], dtype=np.int64),
         }
-        chunks.append(sess.run(["sentence_embedding"], feeds)[0])
+        hidden = sess.run(["last_hidden_state"], feeds)[0]
+        mask = feeds["attention_mask"][..., None].astype(np.float32)
+        chunks.append((hidden * mask).sum(axis=1) / np.clip(mask.sum(axis=1), 1e-9, None))
     vectors = np.concatenate(chunks)
     return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
 
@@ -413,7 +422,12 @@ def main(argv):
         if not query:
             print("no matches; try broader words or `divisions`")
             return 0
-        results = Searcher(mode).rank(query, division, limit)
+        try:
+            searcher = Searcher(mode)
+        except EmbeddingUnavailable as exc:
+            print(f"embedding search unavailable: {exc}", file=sys.stderr)
+            return 4
+        results = searcher.rank(query, division, limit)
         print(format_results(results) or "no matches; try broader words or `divisions`")
         return 0
 

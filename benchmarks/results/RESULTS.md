@@ -154,6 +154,36 @@ Hybrid subtask misses (4 of 37):
 
 ---
 
+## Run 7: switch to the upstream ONNX file (2026-11-23)
+
+The model changed from the `onnx-models` export (no licence stated) to the upstream file
+`onnx/model.onnx` in `sentence-transformers/all-MiniLM-L6-v2` (Apache-2.0), pinned to commit
+`1110a243`. The upstream graph returns token vectors, so the plugin now applies mean pooling
+and L2 normalisation itself. Both were checked against the export before the switch:
+
+| Check | Result |
+|---|---|
+| Per-agent cosine similarity, export vs upstream (282 agents) | min, median and mean all 1.0000 (to four decimals) |
+| Query cosine similarity, export vs upstream (76 queries) | min 1.0000, median 1.0000 |
+| Top-3 results identical for all 76 queries | 100% overlap, top-1 identical for all 76 |
+
+Accuracy after the switch (hybrid unless stated):
+
+| Set | hit@1 | hit@3 | MRR | Change from Run 6 |
+|---|---|---|---|---|
+| eval (31) | 87% | 100% | 0.93 | none |
+| holdout (25) | 80% | 88% | 0.85 | none |
+| holdout2 (20) | 80% | 90% | 0.85 | none |
+| Orchestration, subtask hit@3 (37) | 89% | | | none |
+
+Output size changed by at most two characters per search. Tokenizer settings are unchanged:
+truncation to 256 tokens, and padding to the longest text in each batch.
+
+Packages: the pinned `onnxruntime` has no wheel for Python 3.15, so the setup now prefers
+Python 3.14 and removes a failed virtualenv rather than leaving it behind.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.

@@ -56,7 +56,7 @@ python3 -I <plugin folder>/scripts/roster.py show "Reality Checker"
 |---|---|---|---|
 | Roster (agency-agents) | `$CLAUDE_PLUGIN_DATA/agency-agents` | about 11 MB | `/agency:setup roster` |
 | Python packages for hybrid search | `$CLAUDE_PLUGIN_DATA/.venv` | about 175 MB | `/agency:setup embeddings` |
-| Embedding model (all-MiniLM-L6-v2, ONNX) | `$CLAUDE_PLUGIN_DATA/model` | 90 MB | `/agency:setup embeddings` |
+| Embedding model (all-MiniLM-L6-v2, ONNX file and tokenizer) | `$CLAUDE_PLUGIN_DATA/model` | 90 MB | `/agency:setup embeddings` |
 | Saved search index | `$CLAUDE_PLUGIN_DATA/index.npz` | 0.5 MB | built on first hybrid search |
 
 `$CLAUDE_PLUGIN_DATA` is the plugin's own data folder, which survives plugin updates. Uninstalling
@@ -64,7 +64,7 @@ may leave it behind; check it and delete it by hand if you want the space back.
 
 Downloads come from these sources only:
 - `https://github.com/msitarzewski/agency-agents` (the roster)
-- `https://huggingface.co/onnx-models/all-MiniLM-L6-v2-onnx` (the model, pinned to one commit, each file checked against a SHA-256 hash)
+- `https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2` (the model file and tokenizer, pinned to one commit, each file checked against a SHA-256 hash)
 - the Python package index, for the pinned packages in `scripts/requirements.txt`
 
 ## Context cost
@@ -105,6 +105,7 @@ The plugin layout: `.claude-plugin/` (manifests), `skills/agency/SKILL.md`, `com
 
 ## Licence
 
-The plugin's own licence is not set yet. The roster is MIT-licensed by its authors. The
-embedding model is an ONNX export of `sentence-transformers/all-MiniLM-L6-v2`; check its
-terms before commercial use.
+The plugin is MIT-licensed (see `LICENSE`). The agency-agents roster is MIT-licensed by its
+authors. The embedding model is `sentence-transformers/all-MiniLM-L6-v2`, Apache-2.0, used as
+published in its own repository. Third-party components and their licences are listed in
+`THIRD_PARTY_NOTICES.md`.

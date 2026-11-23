@@ -1,3 +1,8 @@
 __pycache__/
 *.part
 .DS_Store
+
+# local setup artefacts (normally in the plugin data folder; ignored here in case they are created inside the repo)
+.venv/
+model/
+index.npz
