@@ -4,6 +4,13 @@ Find and run specialists from [The Agency](https://github.com/msitarzewski/agenc
 roster (about 280 agents) on demand. Only the specialist you need enters the conversation,
 so the roster doesn't overload context. Nothing is downloaded until you ask.
 
+## Requirements
+
+- bash (macOS and Linux). Windows needs WSL or Git Bash, which I have not tested.
+- git and curl, for the roster and the model download.
+- Python 3.14 for the embedding setup. The pinned `onnxruntime` has no Python 3.15 wheel; the setup picks `python3.14` when it is installed.
+- `shasum` or `sha256sum`, for checksums.
+
 ## Install
 
 In Claude Code:

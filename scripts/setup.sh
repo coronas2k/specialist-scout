@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Check or install the parts of the specialist scout plugin that need downloads.
-# The embedding model is sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0), ONNX file from its own repository.
 #   setup.sh status       read-only: what is installed (default)
 #   setup.sh roster       clone the agency-agents roster into the plugin data folder
 #   setup.sh embeddings   create the virtualenv, download the pinned model, verify checksums
 #   setup.sh all          roster, then embeddings
 # Nothing here runs unless the user has asked for it (see commands/setup.md).
+# Written for bash 3.2 (the macOS default): no associative arrays.
+# The embedding model is sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0), ONNX file from its own repository.
 set -euo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,15 +14,32 @@ DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.cache/specialist-scout}"
 ROSTER_REPO="${AGENCY_ROSTER_REPO:-https://github.com/msitarzewski/agency-agents.git}"
 MODEL_REVISION="1110a243fdf4706b3f48f1d95db1a4f5529b4d41"   # sentence-transformers/all-MiniLM-L6-v2 commit (Apache-2.0)
 MODEL_BASE="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/${MODEL_REVISION}"
+MODEL_NAMES="model.onnx tokenizer.json"
+
 # local file name -> path in the upstream repository
-declare -A REMOTE=(
-  [model.onnx]="onnx/model.onnx"
-  [tokenizer.json]="tokenizer.json"
-)
-declare -A SHA=(
-  [model.onnx]="6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
-  [tokenizer.json]="be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
-)
+remote_path() {
+  case "$1" in
+    model.onnx) echo "onnx/model.onnx" ;;
+    tokenizer.json) echo "tokenizer.json" ;;
+  esac
+}
+
+# SHA-256 each file must have
+expected_sha() {
+  case "$1" in
+    model.onnx) echo "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452" ;;
+    tokenizer.json) echo "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037" ;;
+  esac
+}
+
+# shasum is on macOS and most Linux systems with perl; sha256sum is the GNU fallback.
+sha_of() {
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | cut -d' ' -f1
+  else
+    sha256sum "$1" | cut -d' ' -f1
+  fi
+}
 
 existing_roster() {
   if [ -n "${AGENCY_AGENTS_DIR:-}" ] && [ -f "$AGENCY_AGENTS_DIR/divisions.json" ]; then
@@ -32,7 +50,22 @@ existing_roster() {
   done
 }
 
-sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+model_ok() {
+  for name in $MODEL_NAMES; do
+    [ -f "$DATA/model/$name" ] && [ "$(sha_of "$DATA/model/$name")" = "$(expected_sha "$name")" ] || return 1
+  done
+}
+
+packages_ok() {
+  [ -x "$DATA/.venv/bin/python" ] && "$DATA/.venv/bin/python" -c "import onnxruntime, tokenizers, numpy" 2>/dev/null
+}
+
+status() {
+  echo "data folder: $DATA"
+  if r="$(existing_roster)" && [ -n "$r" ]; then echo "roster:      installed at $r"; else echo "roster:      not installed"; fi
+  if packages_ok; then echo "packages:    installed ($DATA/.venv)"; else echo "packages:    not installed"; fi
+  if model_ok 2>/dev/null; then echo "model:       installed and verified (revision ${MODEL_REVISION:0:12})"; else echo "model:       not installed"; fi
+}
 
 # The pinned onnxruntime has wheels for specific Python versions only (no 3.15 wheel at this pin),
 # so prefer a supported interpreter. Override with PYTHON=/path/to/python.
@@ -43,23 +76,6 @@ pick_python() {
   done
   echo "no python3 found; install Python 3.14 or set PYTHON" >&2
   return 1
-}
-
-model_ok() {
-  for name in "${!SHA[@]}"; do
-    [ -f "$DATA/model/$name" ] && [ "$(sha_of "$DATA/model/$name")" = "${SHA[$name]}" ] || return 1
-  done
-}
-
-status() {
-  echo "data folder: $DATA"
-  if r="$(existing_roster)" && [ -n "$r" ]; then echo "roster:      installed at $r"; else echo "roster:      not installed"; fi
-  if [ -x "$DATA/.venv/bin/python" ] && "$DATA/.venv/bin/python" -c "import onnxruntime, tokenizers, numpy" 2>/dev/null; then
-    echo "packages:    installed ($DATA/.venv)"
-  else
-    echo "packages:    not installed"
-  fi
-  if model_ok 2>/dev/null; then echo "model:       installed and verified (revision ${MODEL_REVISION:0:12})"; else echo "model:       not installed"; fi
 }
 
 install_roster() {
@@ -88,13 +104,14 @@ install_embeddings() {
   fi
 
   mkdir -p "$DATA/model"
-  for name in "${!SHA[@]}"; do
-    if [ -f "$DATA/model/$name" ] && [ "$(sha_of "$DATA/model/$name")" = "${SHA[$name]}" ]; then
+  for name in $MODEL_NAMES; do
+    want="$(expected_sha "$name")"
+    if [ -f "$DATA/model/$name" ] && [ "$(sha_of "$DATA/model/$name")" = "$want" ]; then
       echo "ok        $name"; continue
     fi
     echo "download  $name"
-    curl -sSL --fail --max-time 600 -o "$DATA/model/$name.part" "$MODEL_BASE/${REMOTE[$name]}"
-    if [ "$(sha_of "$DATA/model/$name.part")" != "${SHA[$name]}" ]; then
+    curl -sSL --fail --max-time 600 -o "$DATA/model/$name.part" "$MODEL_BASE/$(remote_path "$name")"
+    if [ "$(sha_of "$DATA/model/$name.part")" != "$want" ]; then
       rm -f "$DATA/model/$name.part"
       echo "checksum mismatch for $name; not installed" >&2
       exit 1

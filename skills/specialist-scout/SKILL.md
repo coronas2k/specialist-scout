@@ -1,6 +1,6 @@
 ---
 name: specialist-scout
-description: Find and run an Agency specialist from the agency-agents roster on demand, without loading the roster into context. Use when the user asks for an Agency agent by name or role ("Reality Checker", "SEO specialist", "unity shader"), says "get/use/activate the <role>", or a task clearly needs a specialist that no installed agent covers. If the roster is not installed, tell the user to run /specialist-scout:setup.
+description: This skill should be used when the user asks to "use an Agency specialist", "get the Reality Checker to review this", "activate an SEO specialist", "find a specialist for this task", or when a task needs a specialist role that no installed agent covers. If the roster is not installed, direct the user to /specialist-scout:setup.
 ---
 
 # Specialist scout: on-demand specialists
