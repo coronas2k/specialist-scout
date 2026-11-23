@@ -225,6 +225,46 @@ on the picker for planning and keep hybrid search for quick lookups.
 
 ---
 
+## Run 9: trying to close the gap to the picker (2026-11-23)
+
+Goal: raise hybrid search on the workflow subtasks toward the picker's accuracy. Hybrid found the
+right specialist in the top three on 20 of 30 workflow subtasks; keyword search and embeddings alone
+found 17 each. The misses were mostly paraphrases (for example "review pull requests" for the code
+reviewer, and "cost and latency of model calls" for FinOps).
+
+Text embedded for each specialist (hybrid only, current model, all query sets: 106 queries):
+
+| Text | hit@1 | hit@3 |
+|---|---|---|
+| name, description, vibe (current) | 76 | 91 |
+| name and description | 76 | 90 |
+| name, description, vibe, first 600 characters of the body | 75 | 89 |
+| name, description, vibe, first 1,200 characters of the body | 75 | 90 |
+
+The current text is as good as any alternative, so the body does not explain the gap.
+
+Embedding model (all 106 queries; bge-small-en-v1.5 is MIT, ONNX from its own repository at commit
+5c38ec7c, checksum verified, CLS pooling):
+
+| Model | Mode | hit@1 | hit@3 |
+|---|---|---|---|
+| MiniLM (current) | embeddings alone | 60% | 77% |
+| bge-small | embeddings alone | 63% | 79% |
+| bge-small with query prefix | embeddings alone | 65% | 77% |
+| MiniLM (current) | hybrid | 72% | 86% |
+| bge-small | hybrid | 70% | 86% |
+| bge-small with query prefix | hybrid | 71% | 86% |
+
+bge-small is marginally better on its own but makes no difference to hybrid search, so it is not
+worth a 133 MB download and a change to the setup. Scripts: `benchmarks/experiments/text_variants.py`
+and `benchmarks/experiments/bge_compare.py`.
+
+Still open: a cross-encoder reranker (bge-reranker-base is MIT, but its ONNX file is 1.1 GB) reads the
+query and each candidate together, which is closer to how the picker works. It is the one lever not
+yet tested.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
