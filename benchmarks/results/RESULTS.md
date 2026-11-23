@@ -633,6 +633,51 @@ needs a larger set before anyone relies on it.
 
 ---
 
+## Run 20: ship test, held-out accuracy, and query rewriting on fresh6 (2026-11-23)
+
+**Ship test (isolated, live config untouched).** Marketplace add and install succeeded in a separate
+`CLAUDE_CONFIG_DIR` (plugin version 0.2.0). In a headless session with the installed copy loaded, the setup
+command's status check ran and so did the skill's search, so `${CLAUDE_PLUGIN_ROOT}` resolves in both. The
+data folder fell back to `~/.cache/specialist-scout`, because `CLAUDE_PLUGIN_DATA` was not set for those calls.
+The README has been corrected. Not tested: a clean machine with no existing roster or model, and Windows.
+
+**Held-out accuracy of the plugin's own search (read-only, no change to the plugin).**
+
+| Set | Top 1 | Top 3 | Top 5 | Top 8 | Top 15 |
+|---|---|---|---|---|---|
+| Dev (226, tuned on) | 61% | 76% | 80% | 83% | 87% |
+| fresh1 (40) | 60% | 70% | 75% | 80% | 82% |
+| fresh2 (40) | 38% | 52% | 62% | 68% | 78% |
+| fresh3 (40) | 57% | 78% | 78% | 78% | 80% |
+| fresh4 (80) | 32% | 49% | 61% | 65% | 74% |
+| New sets pooled (200) | 44% | 60% | 68% | 71% | 78% |
+
+The earlier 80 to 94% headline figures came from tuned sets. The held-out top-three rate is about 60%.
+
+**End-to-end pipeline on fresh6 (100 queries, labels committed before any run).** Pre-registered in
+`PREREG-pipeline.md`. The picker and the rewriter are subagents, which are proxies for the skill's behaviour.
+
+| Measure | Arm A: plugin search, picker chooses | Arm B: rewritten phrases, picker chooses |
+|---|---|---|
+| Recall@8 of the list the picker sees | 62% | 82% |
+| End-to-end pick accuracy | 41% | 59% |
+| Plain stratum (68) | 31% | 57% |
+| Name-overlap stratum (32) | 62% | 62% |
+
+Arm B minus arm A: +0.18 (95% paired-bootstrap interval +0.08 to +0.28). Without the five doubtful labels:
++0.19 (+0.08 to +0.30). All three pre-registered conditions hold, so Arm B is an **adoption candidate**. The
+skill's instructions would change, so adoption needs the user's approval. **Adopted 2026-11-23 on the user's approval** (see `DECISION-query-rewriting.md`).
+
+Caveats: 100 queries; the picker and rewriter are subagents, not the main session; the rewriter saw only the
+request text, with no candidates and no labels; the five doubtful labels are kept. The subagents used about 1.1
+million tokens in total. In the skill, rewriting would be the main model writing four short phrases, which costs
+far less, but that is not what was measured.
+
+Files: `benchmarks/results/pipeline/` (picks, rewrites and score output), `PREREG-pipeline.md`,
+`benchmarks/experiments/pipeline_eval.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.

@@ -115,8 +115,13 @@ From the latest run (see [results/RESULTS.md](results/RESULTS.md) for every run)
 
 | | Keyword | Embeddings | Hybrid |
 |---|---|---|---|
-| holdout2 hit@1 / hit@3 (clean) | 80% / 90% | 65% / 85% | 80% / 90% |
-| Subtask hit@3 (orchestration, 37) | 86% | 81% | 89% |
+| Held-out sets pooled, 200 new queries (fresh1 to fresh4), hit@1 / hit@3 / hit@8 | 44% / 60% / 71% | | |
+| Tuned dev set, 226 queries, hit@1 / hit@3 | 61% / 76% | | |
+| Picker picks the right specialist, new queries (fresh6, 100, shortlist of 8) | 41% | | |
+| Same, after query rewriting (fresh6) | 59% | | |
+
+The earlier headline numbers (80 to 94%) were measured on sets that were tuned on, so they overstate accuracy.
+The held-out figures are the ones to quote. The rewriting row is a proxy run with subagents; see Run 20.
 
 For projects, search one subtask at a time. A single search on the whole project
 prompt covers only 23 to 39% of the needed roles, in every mode.

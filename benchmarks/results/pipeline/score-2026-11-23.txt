@@ -1,0 +1,13 @@
+invalid picks: arm A 0, arm B 0
+recall@8 of the shortlist the picker sees: A 0.62, B 0.82
+end-to-end pick accuracy:
+all 100                            A 0.41  B 0.59  diff +0.180 [+0.080, +0.280] (n=100)
+plain stratum                      A 0.31  B 0.57  diff +0.265 [+0.147, +0.382] (n=68)
+name-overlap stratum               A 0.62  B 0.62  diff +0.000 [-0.188, +0.156] (n=32)
+sensitivity without the five doubtful labels:
+without doubtful                   A 0.43  B 0.62  diff +0.189 [+0.084, +0.295] (n=95)
+primary (all 100)                  A 0.41  B 0.59  diff +0.180 [+0.080, +0.280] (n=100)
+rule 1 (interval lower bound above zero): True
+rule 2 (recall@8, B at least A): True
+rule 3 (plain stratum, B minus A non-negative): True
+DECISION: adoption candidate (needs approval; the skill instructions would change)

@@ -15,12 +15,13 @@ If an agent already in your Agent tool's list fits the job, use it and stop here
 ## 2. Find the specialist
 
 ```bash
-python3 -I "${CLAUDE_PLUGIN_ROOT}/scripts/roster.py" search <keywords> [--division <d>] [--limit 8] [--mode hybrid|bm25|embed]
+python3 -I "${CLAUDE_PLUGIN_ROOT}/scripts/roster.py" search <request words> --also "<phrase 1>" --also "<phrase 2>" --also "<phrase 3>" --also "<phrase 4>" [--division <d>] [--limit 8] [--mode hybrid|bm25|embed]
 python3 -I "${CLAUDE_PLUGIN_ROOT}/scripts/roster.py" divisions
 python3 -I "${CLAUDE_PLUGIN_ROOT}/scripts/roster.py" show <id-or-name>
 ```
 
 - Use words from the role and the task ("seo", "reality check", "pen test").
+- Write four short phrases (2 to 5 words each) in the words a specialist's job description would use. They may differ from the user's words. Pass each one with `--also`. Do not add names of tools, companies or people the request does not mention. The request and the phrases are merged, so the shortlist covers both wordings.
 - If the user named the agent, `show` it directly.
 - `hybrid` is the default. If the embedding setup is missing it falls back to `bm25` and prints a note on stderr. That is fine; keep going.
 - If two candidates fit about equally, pick the closer one. Ask only when the choice changes the outcome.

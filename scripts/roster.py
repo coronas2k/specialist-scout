@@ -2,7 +2,11 @@
 """Search the agency-agents roster without loading it into context.
 
 Usage:
-  roster.py search <words...> [--division d] [--limit n] [--mode hybrid|bm25|embed]
+  roster.py search <words...> [--also <phrase>]... [--division d] [--limit n] [--mode hybrid|bm25|embed]
+
+With --also, each phrase is searched too (top 15 each). The request and every phrase are merged by each
+specialist's best rank, with ties going to the request, and the top --limit are shown. Use 3 or 4 phrases
+written in the words a specialist's job description would use.
   roster.py divisions
   roster.py show <id-or-name>      # print the full path of one agent file
   roster.py verify-model           # check the embedding model files' SHA-256
@@ -352,6 +356,24 @@ class Searcher:
         return [self.pool[i] for i in order[:limit]]
 
 
+def rank_merged(searcher, query, phrases, division=None, limit=8, depth=15):
+    """Merge the request and its rewritten phrases by best rank (ties to the request).
+
+    This is the method measured in the fresh6 pipeline test (benchmarks/experiments/pipeline_eval.py).
+    Each query is searched to depth 15, a specialist keeps its best (rank, is_phrase) pair, and the
+    top `limit` pairs are returned in that order.
+    """
+    queries = [query] + [p for p in phrases if p and p.strip()]
+    best = {}
+    for k, q in enumerate(queries):
+        for r, agent in enumerate(searcher.rank(q, division, depth), start=1):
+            cand = (r, 0 if k == 0 else 1)
+            key = agent["id"]
+            if key not in best or cand < best[key][0]:
+                best[key] = (cand, agent)
+    return [agent for _, agent in sorted(best.values(), key=lambda x: x[0])[:limit]]
+
+
 def format_results(results):
     lines = []
     for a in results:
@@ -406,10 +428,13 @@ def main(argv):
         return 1
 
     if cmd == "search":
-        division, limit, mode, words = None, 8, "hybrid", []
+        division, limit, mode, words, alsos = None, 8, "hybrid", [], []
         i = 0
         while i < len(rest):
-            if rest[i] == "--division" and i + 1 < len(rest):
+            if rest[i] == "--also" and i + 1 < len(rest):
+                alsos.append(rest[i + 1])
+                i += 2
+            elif rest[i] == "--division" and i + 1 < len(rest):
                 division, i = rest[i + 1].lower(), i + 2
             elif rest[i] == "--limit" and i + 1 < len(rest):
                 limit, i = int(rest[i + 1]), i + 2
@@ -427,7 +452,10 @@ def main(argv):
         except EmbeddingUnavailable as exc:
             print(f"embedding search unavailable: {exc}", file=sys.stderr)
             return 4
-        results = searcher.rank(query, division, limit)
+        if alsos:
+            results = rank_merged(searcher, query, alsos, division, limit)
+        else:
+            results = searcher.rank(query, division, limit)
         print(format_results(results) or "no matches; try broader words or `divisions`")
         return 0
 
