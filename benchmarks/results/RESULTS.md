@@ -266,6 +266,28 @@ yet tested.
 
 ---
 
+## Run 12: cross-encoder reranking of the current hybrid's top 15 (2026-11-23)
+
+Two small rerankers, each run on the current hybrid's top 15 candidates for all 106 queries. Both
+read the query and each candidate together. The candidate text is name, description and vibe.
+
+| Reranker (Apache-2.0) | Mode | hit@1 (of 106) | hit@3 (of 106) | Time per query |
+|---|---|---|---|---|
+| Current hybrid (Run 9) | none | 76 | 91 | none |
+| ms-marco-MiniLM-L6-v2, qint8 arm64 (23 MB) | rerank only | 72 | 87 | 104 ms |
+| ms-marco-MiniLM-L6-v2, qint8 arm64 (23 MB) | hybrid rank + rerank (RRF) | 76 | 92 | 104 ms |
+| jina-reranker-v1-tiny-en, int8 (33 MB) | rerank only | 77 | 89 | 84 ms |
+| jina-reranker-v1-tiny-en, int8 (33 MB) | hybrid rank + rerank (RRF) | 76 | 89 | 84 ms |
+
+Sanity check: both rerankers rank Mars first on the card's example (ms-marco scores Venus at −6.9,
+Mars at +9.7). The tokenizers and model files match their repository checksums.
+
+Verdict: no reranker improves hybrid search. Rerank-only is worse on the top three, and the RRF
+combination moves the top three by one query, which is noise. A reranker would also add a second
+model. See `DECISION-no-reranker.md`. Script: `benchmarks/experiments/rerank_eval.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
