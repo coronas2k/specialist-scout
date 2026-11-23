@@ -1,0 +1,41 @@
+harness check on fresh2 (expects A 15/21/0.464, D 16/24/0.508): got A 15/21/0.464, D 16/24/0.508 -> PASS
+
+strata: pooled fresh2+fresh3 = 80 queries; plain 48, name-overlap 32
+fresh3 strata: plain 18, name-overlap 22
+
+fresh3 (40 queries, held out, labels committed before any run)
+  A (default, full    ): first  23  top3  31  MRR 0.671
+  B (run18  , full    ): first  24  top3  31  MRR 0.691
+  C (default, avg_name): first  23  top3  31  MRR 0.671
+  D (run18  , avg_name): first  23  top3  30  MRR 0.672
+
+pooled fresh2 + fresh3 (80 queries)
+  A (default, full    ): first  38  top3  52  MRR 0.567
+  B (run18  , full    ): first  38  top3  55  MRR 0.583
+  C (default, avg_name): first  38  top3  51  MRR 0.565
+  D (run18  , avg_name): first  39  top3  54  MRR 0.590
+
+Primary comparison (pre-registered): D (Run 18 setting) vs A (plugin today)
+  fresh3                             n= 40  first  23 vs  23 (x-only 1, y-only 1, p=1.000)  top3  30 vs  31 (x-only 0, y-only 1, p=1.000)  MRR 0.672 vs 0.671, diff +0.001 [-0.037, +0.040]
+  pooled fresh2 + fresh3             n= 80  first  39 vs  38 (x-only 2, y-only 1, p=1.000)  top3  54 vs  52 (x-only 4, y-only 2, p=0.688)  MRR 0.590 vs 0.567, diff +0.023 [-0.007, +0.054]
+
+Attribution, pooled fresh2 + fresh3 (x - y differences):
+  keyword effect, avg_name view: D vs C n= 80  first  39 vs  38 (x-only 2, y-only 1, p=1.000)  top3  54 vs  51 (x-only 5, y-only 2, p=0.453)  MRR 0.590 vs 0.565, diff +0.026 [-0.004, +0.057]
+  keyword effect, full view: B vs A  n= 80  first  38 vs  38 (x-only 2, y-only 2, p=1.000)  top3  55 vs  52 (x-only 4, y-only 1, p=0.375)  MRR 0.583 vs 0.567, diff +0.016 [-0.012, +0.044]
+  name-view effect, default kw: C vs A n= 80  first  38 vs  38 (x-only 0, y-only 0, p=1.000)  top3  51 vs  52 (x-only 0, y-only 1, p=1.000)  MRR 0.565 vs 0.567, diff -0.003 [-0.008, +0.003]
+  name-view effect, run18 kw: D vs B n= 80  first  39 vs  38 (x-only 2, y-only 1, p=1.000)  top3  54 vs  55 (x-only 1, y-only 2, p=1.000)  MRR 0.590 vs 0.583, diff +0.007 [-0.019, +0.035]
+
+Stratified, pooled fresh2 + fresh3:
+  plain: D vs A                      n= 48  first  15 vs  14 (x-only 2, y-only 1, p=1.000)  top3  22 vs  23 (x-only 1, y-only 2, p=1.000)  MRR 0.407 vs 0.384, diff +0.023 [-0.021, +0.069]
+  plain: C vs A (name view only)     n= 48  first  14 vs  14 (x-only 0, y-only 0, p=1.000)  top3  22 vs  23 (x-only 0, y-only 1, p=1.000)  MRR 0.377 vs 0.384, diff -0.007 [-0.016, -0.001]
+  plain: B vs A (keyword only)       n= 48  first  13 vs  14 (x-only 1, y-only 2, p=1.000)  top3  24 vs  23 (x-only 2, y-only 1, p=1.000)  MRR 0.395 vs 0.384, diff +0.011 [-0.030, +0.050]
+  name-overlap: D vs A               n= 32  first  24 vs  24 (x-only 0, y-only 0, p=1.000)  top3  32 vs  29 (x-only 3, y-only 0, p=0.250)  MRR 0.865 vs 0.842, diff +0.022 [-0.008, +0.063]
+
+Sensitivity, adding fresh1 (120 queries): D vs A
+  all three sets                     n=120  first  61 vs  62 (x-only 3, y-only 4, p=1.000)  top3  83 vs  80 (x-only 7, y-only 4, p=0.549)  MRR 0.609 vs 0.597, diff +0.012 [-0.018, +0.044]
+
+Pre-registered decision rule:
+  1. pooled MRR CI for D-A excludes zero (lower bound > 0): False
+  2. plain stratum D-A point estimate > 0:                  True
+  3. plain stratum name-view effect C-A point estimate > 0: False
+  DECISION: not supported (failed rule 1, 3)

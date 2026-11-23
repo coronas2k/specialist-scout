@@ -266,6 +266,373 @@ yet tested.
 
 ---
 
+## Run 10: late interaction (ColBERT) on all 106 queries (2026-11-23)
+
+Model: `answerdotai/answerai-colbert-small-v1` (Apache-2.0), int8 ONNX, pinned at commit 934fa8bb.
+Encoding rebuilt from its `onnx_config.json` and model card: query marker, 32-position query
+padded with the mask token, document marker, punctuation masking. Checked against the card's
+example: the ranking matches; scores differ by about one point (int8 file versus the card's
+full-precision model). Documents: name, description and vibe (mean 60 tokens, max 248).
+
+| Method | hit@1 (of 106) | hit@3 (of 106) |
+|---|---|---|
+| Keyword (BM25 with name bonus) | 72 | 88 |
+| Late interaction alone | 69 | 81 |
+| Keyword + late interaction, weight 0.5 | 72 | 92 |
+| Keyword + late interaction, weight 1.0 | 74 | 89 |
+| Keyword + late interaction, weight 2.0 | 75 | 88 |
+| Current hybrid (keyword + MiniLM, Run 9) | 76 | 91 |
+| Keyword + MiniLM + late interaction, weight 0.5 (same run as the baseline below) | 74 | 92 |
+| Keyword + MiniLM (same run, min-max scaling) | 75 | 93 |
+
+Verdict: rejected. Late interaction alone beats the MiniLM embeddings at first place (69 against
+64), but it does not improve hybrid search. Adding it to the current hybrid changes hit@3 by one
+query in either direction, which is noise. The reason for the decision is in
+`DECISION-no-late-interaction.md`. Scripts: `benchmarks/experiments/colbert_core.py` and
+`benchmarks/experiments/colbert_eval.py`.
+
+---
+
+## Run 11: full-precision late interaction (fp32), same 106 queries (2026-11-23)
+
+Same model and pinned commit as Run 10, with the full-precision `model.onnx` (133 MB, checksum
+verified) in place of the int8 file.
+
+| Method | int8 hit@1 / hit@3 | fp32 hit@1 / hit@3 |
+|---|---|---|
+| Keyword (BM25 with name bonus) | 72 / 88 | 72 / 88 |
+| Late interaction alone | 69 / 81 | 70 / 81 |
+| Keyword + late interaction, weight 0.5 | 72 / 92 | 72 / 92 |
+| Keyword + late interaction, weight 1.0 | 74 / 89 | 73 / 90 |
+| Keyword + late interaction, weight 2.0 | 75 / 88 | 73 / 88 |
+| Current hybrid (Run 9) | 76 / 91 | 76 / 91 |
+
+Model card example (scores for Venus, Mars, Jupiter, Saturn; the card reports 30.57, 31.49, 31.30,
+31.31): int8 gives 29.66, 30.39, 30.17, 30.24, about one point low; fp32 gives 30.06, 30.80, 30.61,
+30.70, about 0.6 low. Both reproduce the card's ranking. Quantisation explains part of the gap, not
+all of it. The rest is presumably a difference in implementation (for example query padding), which
+was not investigated.
+
+Verdict unchanged: the full-precision model adds nothing to hybrid search.
+
+---
+
+## Run 12: cross-encoder reranking of the current hybrid's top 15 (2026-11-23)
+
+Two small rerankers, each run on the current hybrid's top 15 candidates for all 106 queries. Both
+read the query and each candidate together. The candidate text is name, description and vibe.
+
+| Reranker (Apache-2.0) | Mode | hit@1 (of 106) | hit@3 (of 106) | Time per query |
+|---|---|---|---|---|
+| Current hybrid (Run 9) | none | 76 | 91 | none |
+| ms-marco-MiniLM-L6-v2, qint8 arm64 (23 MB) | rerank only | 72 | 87 | 104 ms |
+| ms-marco-MiniLM-L6-v2, qint8 arm64 (23 MB) | hybrid rank + rerank (RRF) | 76 | 92 | 104 ms |
+| jina-reranker-v1-tiny-en, int8 (33 MB) | rerank only | 77 | 89 | 84 ms |
+| jina-reranker-v1-tiny-en, int8 (33 MB) | hybrid rank + rerank (RRF) | 76 | 89 | 84 ms |
+
+Sanity check: both rerankers rank Mars first on the card's example (ms-marco scores Venus at −6.9,
+Mars at +9.7). The tokenizers and model files match their repository checksums.
+
+Verdict: no reranker improves hybrid search. Rerank-only is worse on the top three, and the RRF
+combination moves the top three by one query, which is noise. A reranker would also add a second
+model. See `DECISION-no-reranker.md`. Script: `benchmarks/experiments/rerank_eval.py`.
+
+---
+
+## Run 13: six other embedding models in the plugin's hybrid search (2026-11-23)
+
+Each model replaces MiniLM in the plugin's own hybrid search (keyword plus embeddings, the same
+linear blend), on all 106 queries. Each file was checked against its published checksum, and each
+tokenizer against git's blob hash. Pooling and query prefixes follow each model's configuration:
+arctic-embed uses CLS pooling and a query prefix; e5 uses `query:` and `passage:`; nomic uses
+`search_query:` and `search_document:`. The nomic file is the int8 quantised version (137 MB), since
+its fp32 file is 547 MB. Times are on this Mac, CPU only.
+
+| Model | Size | Embedding only, hit@1 / hit@3 | Hybrid, hit@1 / hit@3 | Query time | Index build |
+|---|---|---|---|---|---|
+| MiniLM-L6 (current) | 90 MB | 64 / 82 | 76 / 91 | 1.6 ms | 12 s |
+| arctic-embed-xs | 90 MB | 69 / 86 | 75 / 91 | 2.6 ms | 10 s |
+| arctic-embed-s | 133 MB | 68 / 82 | 76 / 91 | 4.9 ms | 21 s |
+| all-MiniLM-L12-v2 | 133 MB | 67 / 78 | 76 / 91 | 3.7 ms | 21 s |
+| gte-small | 133 MB | 73 / 85 | 74 / 88 | 4.0 ms | 21 s |
+| e5-small-v2 | 133 MB | 71 / 79 | 74 / 90 | 4.4 ms | 22 s |
+| nomic-embed-text-v1.5 (int8) | 137 MB | 61 / 78 | 74 / 89 | 7.7 ms | 542 s |
+
+Verdict: no model improves hybrid search. Several are better on their own: gte-small reaches first
+place on 73 queries, against 64 for MiniLM, and arctic-embed-xs reaches the top three on 86, against
+82. None of that carries into the hybrid, which stays at about 86% in the top three for every model.
+The hybrid is limited by how its parts are combined, and by queries that need meaning rather than
+vocabulary, not by the choice of embedding model. Script: `benchmarks/experiments/embed_models.py`.
+
+---
+
+## Run 14: tuning the hybrid per embedding model, with a train/validation split (2026-11-23)
+
+Split: tuning on `eval.json` and `holdout.json` (56 queries); validation on `holdout2.json` and the
+workflows (50 queries). Settings were chosen on the tuning split only, and the grid covered BM25 `k1`
+(0.9, 1.2, 1.6), `b` (0.5, 0.75, 1.0), body weight (0, 0.5, 1), name bonus (0, 5, 10), fusion weight
+(0.5 to 2.0), and two normalisations (`max` as in the plugin, and `minmax`). The harness reproduces the
+plugin's default hybrid: MiniLM at default settings gives 76 first-place and 91 top-three hits across
+all 106 queries.
+
+Validation split (50 queries):
+
+| Model | Settings | hit@1 | hit@3 | MRR |
+|---|---|---|---|---|
+| MiniLM-L6 (current) | default | 29 | 38 | 0.68 |
+| MiniLM-L6 | tuned | 30 | 39 | 0.70 |
+| arctic-embed-xs | default | 28 | 38 | 0.67 |
+| arctic-embed-xs | tuned | 31 | 39 | 0.71 |
+| gte-small | default | 28 | 35 | 0.65 |
+| gte-small | tuned | 31 | 40 | 0.71 |
+
+Tuned settings: MiniLM `k1` 1.6, `b` 0.75, body weight 0.5, name bonus 5, fusion weight 2.0 (max);
+arctic-embed-xs `k1` 1.6, `b` 0.5, body weight 0.5, name bonus 10, fusion weight 2.0 (max); gte-small
+`k1` 1.6, `b` 0.75, body weight 0.5, name bonus 5, fusion weight 0.5 (minmax).
+
+Verdict: tuning gains one to three queries out of 50 on the validation split, which is within noise.
+gte-small tuned is the best validation result (31 and 40, MRR 0.71), one query ahead of tuned MiniLM
+on first place and one on the top three. Three things argue against changing the plugin on this
+evidence alone: the settings differ between models, the best `k1` sits at the edge of the grid, and
+the validation split was used in earlier diagnosis. A fresh labelled set is needed before any change.
+Script: `benchmarks/experiments/tune_hybrid.py`.
+
+---
+
+## Run 15: can arctic-embed-xs beat MiniLM once tuned? Cross-validation over 106 queries (2026-11-23)
+
+Five folds, deterministic shuffle. For each fold, the hybrid settings are chosen on the other four
+folds and scored on the held-out fold, so every query is scored by settings that never saw it. The
+default column uses the plugin's fixed settings for reference.
+
+| Model | Default: hit@1 / hit@3 / MRR | Tuned by cross-validation: hit@1 / hit@3 / MRR |
+|---|---|---|
+| MiniLM-L6 (current) | 76 / 91 / 0.80 | 76 / 94 / 0.80 |
+| arctic-embed-xs, with query prefix | 75 / 91 / 0.78 | 76 / 92 / 0.80 |
+| arctic-embed-xs, no query prefix | 75 / 89 / 0.78 | 79 / 89 / 0.80 |
+| Ensemble: arctic-embed-xs and MiniLM (two models) | 75 / 91 / 0.79 | 77 / 95 / 0.81 |
+
+Verdict: arctic-embed-xs does not beat MiniLM. With its prefix it ties on first place and trails by
+two queries in the top three. Without the prefix it is better on first place (79 against 76) and
+worse in the top three (89 against 94), so the prefix trades one for the other. Tuning helps MiniLM
+by three queries in the top three, and the chosen settings were mostly the same across folds
+(min-max fusion, `b` 1.0). The ensemble is the best row, but it needs two models (about 180 MB together).
+
+Limits: the best settings often sit at the edge of the grid (`k1` 1.6 and `b` 1.0), so a wider grid
+might change them. Differences of two or three queries are within noise on 106 queries.
+Script: `benchmarks/experiments/cv_hybrid.py`.
+
+---
+
+## Run 16: widened grid, cross-validated, 106 queries (2026-11-23)
+
+Same five-fold protocol as Run 15, with a wider grid: BM25 `k1` 0.6 to 2.4, `b` 0 to 1, body weight 0
+to 1, name bonus 0 to 20, fusion weight 0.25 to 4, and two normalisations. Keyword scores and rank
+metrics are vectorised; the keyword scores match the loop version to rounding error.
+
+| Model | Default: hit@1 / hit@3 / MRR | Widened grid, cross-validated: hit@1 / hit@3 / MRR |
+|---|---|---|
+| MiniLM-L6 (current) | 76 / 91 / 0.80 | 74 / 93 / 0.79 |
+| arctic-embed-xs, with prefix | 75 / 91 / 0.78 | 79 / 92 / 0.82 |
+| arctic-embed-xs, no prefix | 75 / 89 / 0.78 | 78 / 89 / 0.79 |
+| gte-small | 74 / 88 / 0.77 | 77 / 92 / 0.80 |
+| Ensemble (two models) | 75 / 91 / 0.79 | 77 / 92 / 0.81 |
+
+Compared with Run 15 (narrow grid), MiniLM fell from 76 to 74 on first place, and arctic-embed-xs with
+prefix rose from 76 to 79. So the grid choice alone moves these results by two to three queries.
+
+Reading: arctic-embed-xs with its prefix is the first setting in these runs to beat MiniLM on first
+place (by five queries) and on MRR, while trailing by one query in the top three. That is not yet
+established. Arctic's chosen `k1` sat at the new maximum (2.4) in four of five folds, so the grid is
+still too narrow for it, and the chosen settings change from fold to fold. Several queries separate
+the two models, and the difference is smaller than the swing from the grid change. Next steps would
+be a wider `k1` range and a new labelled set.
+Script: `benchmarks/experiments/cv_hybrid_wide.py`.
+
+---
+
+## Run 17: one shared setting, paired tests, and a fresh labelled set (2026-11-23)
+
+Shared setting, chosen on the tuning split (eval and holdout, 56 queries) only, for both models:
+BM25 `k1` 2.0, `b` 0.0, body weight 0.25, name bonus 10, fusion weight 1.5, `max` normalisation. It
+was chosen to maximise the two models' combined top-three hits on the tuning split. On the tuning
+split, MiniLM reaches 48 first and 54 top three, and arctic-embed-xs 48 and 53.
+
+Fresh set (`benchmarks/data/fresh.json`): 40 queries written and id-checked before any model was run on
+them, with no exact repeats of earlier queries. Validation: holdout2 and the workflows (50 queries).
+
+| Split | Model | First place | Top three | MRR |
+|---|---|---|---|---|
+| Fresh (40) | MiniLM-L6 | 22 | 29 | not reported alone; see the paired difference below |
+| Fresh (40) | arctic-xs (prefix) | 20 | 27 | not reported alone; see the paired difference below |
+| Validation (50) | MiniLM-L6 | 30 | 38 | not reported alone; see the paired difference below |
+| Validation (50) | arctic-xs (prefix) | 31 | 38 | not reported alone; see the paired difference below |
+
+Paired per-query tests (exact McNemar on first-place and top-three outcomes; paired bootstrap, 10,000
+resamples, on the reciprocal-rank difference, arctic minus MiniLM):
+
+| Split | First place: arctic-only / MiniLM-only, p | Top three: arctic-only / MiniLM-only, p | Mean reciprocal-rank difference (95% CI) |
+|---|---|---|---|
+| Fresh (40) | 2 / 4, p = 0.69 | 0 / 2, p = 0.50 | -0.041 (-0.114 to +0.025) |
+| Validation (50) | 1 / 0, p = 1.00 | 1 / 1, p = 1.00 | +0.015 (-0.002 to +0.039) |
+| Pooled (90) | 3 / 4, p = 1.00 | 1 / 3, p = 0.63 | -0.010 (-0.045 to +0.022) |
+
+Reference, each model at its own default settings on the fresh set: MiniLM 24 first, 28 top three, MRR
+0.657; arctic 21 first, 27 top three, MRR 0.610. Note that the shared setting costs MiniLM two first-place
+hits on the fresh set compared with its default, which is a further sign that tuned settings do not
+carry over.
+
+Verdict: no evidence that arctic-embed-xs beats MiniLM. Neither model is significantly ahead, and the
+point estimates lean slightly towards MiniLM on the fresh set. The sample is too small to separate
+them: on the fresh set only six queries disagree on first place, and the reciprocal-rank interval
+(-0.11 to +0.03) cannot rule out a difference of about 0.03 in either direction. A larger fresh set would
+be needed to detect a difference of that size.
+
+Script: `benchmarks/experiments/shared_setting_test.py`. Data: `benchmarks/data/fresh.json`.
+
+---
+
+## Run 18: tuning the MiniLM hybrid further, with a second fresh set (2026-11-23)
+
+> Update: Run 19 (pre-registered, third fresh set) did not support the name-view finding below. See Run 19.
+
+Adds two things the earlier grids did not cover: separate field weights for the keyword side (name 3 or
+5, description 2 or 3), and three embedding views per agent (full text, name only, description only),
+combined per query as the full view, the average of full and name, the average of full and description,
+or the maximum of full and name. The grid has 30,720 settings.
+
+Selection on the 106 earlier queries (eval, holdout, holdout2 and the workflows):
+
+| Setting | First place | Top three | MRR |
+|---|---|---|---|
+| Current default | 76 | 91 | 0.796 |
+| Expanded grid, cross-validated | 77 | 92 | 0.807 |
+
+Chosen on all 106: BM25 `k1` 2.0, `b` 1.0, name weight 3, description weight 2, body weight 0.25, name
+bonus 10; fusion weight 1.5 with `max` normalisation; the average of the full and name-only views. Name
+views were chosen in four of five folds, which suggests name-only similarity carries signal the full text
+dilutes.
+
+Fresh set 2 (`benchmarks/data/fresh2.json`, 40 queries, written and id-checked before this run; held out
+and new):
+
+| Setting | First place | Top three | MRR |
+|---|---|---|---|
+| Current default | 15 | 21 | 0.464 |
+| Chosen | 16 | 24 | 0.508 |
+
+Paired tests (exact McNemar; paired bootstrap for the reciprocal-rank difference): first place, chosen-only
+1 and default-only 0, p = 1.00; top three, chosen-only 4 and default-only 1, p = 0.38; MRR difference
++0.045, 95% interval +0.003 to +0.095.
+
+For reference, the first fresh set (seen in Run 17, so not a clean test): default 24 and 28, chosen 22 and 29.
+
+Verdict: a small improvement on new queries, mostly in the top three and in MRR. The interval on MRR
+barely excludes zero, and the top-three result is not significant on 40 queries. The first fresh set
+does not confirm it, and the two fresh sets differ a lot in difficulty (the default manages 15 first-place
+hits on the new set and 24 on the old one). Before adopting the change in the plugin, it needs a third
+fresh set. Script: `benchmarks/experiments/minilm_tuning.py`. Data: `benchmarks/data/fresh2.json`.
+
+---
+
+## Run 19: pre-registration, third fresh set and the name-view lead (2026-11-23)
+
+Written before any model is run on `benchmarks/data/fresh3.json` (40 queries, labels committed in
+`bec7ae6` on their own, with no results).
+
+Configurations, fixed in advance (`benchmarks/experiments/prereg_lead.py`):
+
+| Label | Keyword side | Embedding view |
+|---|---|---|
+| A | plugin default: k1 1.2, b 0.75, body weight 0.5, name bonus 5, fusion 1.0 | full text |
+| B | Run 18 keyword side: k1 2.0, b 1.0, body weight 0.25, name bonus 10, fusion 1.5 | full text |
+| C | plugin default keyword side | average of full and name-only |
+| D | Run 18 keyword side | average of full and name-only (the Run 18 setting) |
+
+Primary comparison: D against A, on the pooled fresh2 and fresh3 sets (80 queries). Fresh1 is reported
+as a sensitivity check. Nothing is selected on any of these sets.
+
+Strata, fixed in code: a query is "name-overlap" if a lowercase word of three or more letters, not a
+stopword, appears in the name of an expected specialist; otherwise it is "plain". The name-view lead
+matters most on plain queries, so the plain stratum is the test of it.
+
+Harness check: on fresh2, A must reproduce Run 18 (15 first, 21 top three, MRR 0.464) and D (16, 24,
+0.508). If it does not, nothing is reported.
+
+Decision rule, fixed before the run. The name view is adopted as a candidate only if all three hold:
+
+1. On the pooled 80 queries, the 95% paired-bootstrap interval for the MRR difference D minus A
+   excludes zero (lower bound above zero).
+2. On the plain stratum of the pooled set, D minus A has a positive MRR point estimate.
+3. On the plain stratum of the pooled set, the name-view effect (C minus A) has a positive MRR point
+   estimate.
+
+If rule 1 fails, the lead is not supported. If rule 1 holds but rule 2 or 3 fails, the gain comes from
+name matching the plain queries do not contain, and it is not adopted for them. Adoption also needs the
+user's approval, because it adds a second vector set to the index. No label is edited after results are
+seen; doubtful labels are noted, not changed.
+
+---
+
+### Run 19 results
+
+Raw output: `benchmarks/results/prereg-2026-11-23.txt`. The harness check passed: on fresh2, A gave
+15 / 21 / 0.464 and D gave 16 / 24 / 0.508, the Run 18 numbers.
+
+Third fresh set, 40 queries (18 plain, 22 name-overlap):
+
+| Config | First | Top three | MRR |
+|---|---|---|---|
+| A, plugin default | 23 | 31 | 0.671 |
+| B, Run 18 keyword side | 24 | 31 | 0.691 |
+| C, default keyword side, name view | 23 | 31 | 0.671 |
+| D, Run 18 setting | 23 | 30 | 0.672 |
+
+Primary comparison, D against A (the pre-registered test):
+
+| Set | First (D vs A) | Top three (D vs A) | MRR difference, 95% interval |
+|---|---|---|---|
+| fresh3 (40) | 23 vs 23 | 30 vs 31 | +0.001 (-0.037 to +0.040) |
+| Pooled fresh2 + fresh3 (80) | 39 vs 38 | 54 vs 52 | +0.023 (-0.007 to +0.054) |
+
+Attribution on the pooled 80 (MRR difference, 95% interval): keyword effect with name view (D minus C)
++0.026 (-0.004 to +0.057); keyword effect with full view (B minus A) +0.016 (-0.012 to +0.044); name-view
+effect with default keyword side (C minus A) -0.003 (-0.008 to +0.003); name-view effect with Run 18
+keyword side (D minus B) +0.007 (-0.019 to +0.035).
+
+Strata, pooled 80 (MRR difference, 95% interval):
+
+| Stratum | D minus A | C minus A (name view alone) | B minus A (keyword alone) |
+|---|---|---|---|
+| Plain, 48 queries | +0.023 (-0.021 to +0.069) | -0.007 (-0.016 to -0.001) | +0.011 (-0.030 to +0.050) |
+| Name-overlap, 32 queries | +0.022 (-0.008 to +0.063) | not run | not run |
+
+Sensitivity, adding fresh1 (120 queries): D minus A +0.012 (-0.018 to +0.044).
+
+Decision rule:
+
+1. Pooled interval for D minus A excludes zero: **no** (lower bound -0.007).
+2. Plain-stratum D minus A point estimate positive: **yes** (+0.023), but its interval includes zero.
+3. Plain-stratum name-view effect (C minus A) positive: **no** (-0.007).
+
+Decision: **not supported**. The Run 18 setting is not adopted, and the plugin keeps the current
+MiniLM settings. No second vector set is added.
+
+What this means for the lead. Run 18's gain on fresh2 (one more first place, three more in the top
+three) did not appear on fresh3, where the two settings tie on first place and differ by one in the top
+three. There is no sign that the name view helps plain queries. Alone it changes the rank of 24 of the 48
+plain queries, but only 5 of those changes move MRR: one query improves and four get worse. The
+−0.007 estimate rests on those five queries, so its interval is not strong evidence. Rule 3 was not a
+pre-registered primary test, so treat the negative estimate as exploratory. The pooled gains of about
+0.02 MRR are within noise.
+
+Caveats: the sets are 40 queries each, and the labels are mine. Name overlap is a crude proxy for
+role-named queries, and the plain stratum has only 48 queries. The name-view effect on plain queries
+needs a larger set before anyone relies on it.
+
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.

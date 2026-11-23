@@ -51,3 +51,10 @@ embeds it.
 benchmarks/experiments/text_variants.py <work dir>
 benchmarks/experiments/bge_compare.py <work dir>   # needs a bge/ folder with model.onnx and tokenizer.json
 ```
+
+## Update (Run 13): six more embedding models
+
+Also tested: arctic-embed-xs and arctic-embed-s (Apache-2.0), all-MiniLM-L12-v2 (Apache-2.0),
+gte-small (MIT), e5-small-v2 (MIT) and nomic-embed-text-v1.5 (Apache-2.0, int8). None improves the
+hybrid, and arctic-embed-xs ties it at the same size. The decision stands: keep all-MiniLM-L6-v2.
+See Run 13 in `RESULTS.md`.

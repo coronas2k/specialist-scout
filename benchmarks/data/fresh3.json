@@ -1,0 +1,246 @@
+[
+ {
+  "query": "I need someone to predict which customers will cancel next month",
+  "expect": [
+   "engineering-ai-engineer",
+   "engineering-data-engineer"
+  ]
+ },
+ {
+  "query": "data scientist for churn modelling",
+  "expect": [
+   "engineering-ai-engineer"
+  ]
+ },
+ {
+  "query": "security reviewer for our Terraform files",
+  "expect": [
+   "security-cloud-security-architect",
+   "security-appsec-engineer"
+  ]
+ },
+ {
+  "query": "copywriter for our landing page headline",
+  "expect": [
+   "marketing-content-creator"
+  ]
+ },
+ {
+  "query": "our error messages confuse users",
+  "expect": [
+   "design-ux-architect",
+   "engineering-technical-writer"
+  ]
+ },
+ {
+  "query": "game economy balancing spreadsheet",
+  "expect": [
+   "economy-designer"
+  ]
+ },
+ {
+  "query": "our token contract may waste gas",
+  "expect": [
+   "engineering-solidity-smart-contract-engineer",
+   "security-blockchain-security-auditor"
+  ]
+ },
+ {
+  "query": "tax planning memo for a freelancer",
+  "expect": [
+   "finance-tax-strategist"
+  ]
+ },
+ {
+  "query": "bookkeeping cleanup for quarterly close",
+  "expect": [
+   "finance-bookkeeper-controller"
+  ]
+ },
+ {
+  "query": "a lawyer's client intake form",
+  "expect": [
+   "legal-client-intake"
+  ]
+ },
+ {
+  "query": "a loan application summary",
+  "expect": [
+   "loan-officer-assistant"
+  ]
+ },
+ {
+  "query": "we keep getting applications from people who don't fit",
+  "expect": [
+   "recruitment-specialist"
+  ]
+ },
+ {
+  "query": "resume tailoring for a backend role",
+  "expect": [
+   "resume-tailor"
+  ]
+ },
+ {
+  "query": "write a listing for a house we're selling",
+  "expect": [
+   "real-estate-buyer-seller"
+  ]
+ },
+ {
+  "query": "study abroad application essays",
+  "expect": [
+   "study-abroad-advisor"
+  ]
+ },
+ {
+  "query": "customers keep asking how to send items back",
+  "expect": [
+   "retail-customer-returns"
+  ]
+ },
+ {
+  "query": "hospitality guest messages about check-in",
+  "expect": [
+   "hospitality-guest-services"
+  ]
+ },
+ {
+  "query": "I want a structured plan to get fitter and more focused",
+  "expect": [
+   "personal-growth-mentor"
+  ]
+ },
+ {
+  "query": "elder care scheduling for a parent",
+  "expect": [
+   "healthcare-aging-parent-care-companion"
+  ]
+ },
+ {
+  "query": "the insurer rejected our clinic's claim codes",
+  "expect": [
+   "medical-billing-coding-specialist"
+  ]
+ },
+ {
+  "query": "civil engineering checks for a bridge design",
+  "expect": [
+   "specialized-civil-engineer"
+  ]
+ },
+ {
+  "query": "Salesforce architecture for our CRM customisations",
+  "expect": [
+   "specialized-salesforce-architect"
+  ]
+ },
+ {
+  "query": "analyse competitor price changes",
+  "expect": [
+   "specialized-pricing-analyst"
+  ]
+ },
+ {
+  "query": "our containers are stuck in customs",
+  "expect": [
+   "supply-chain-strategist"
+  ]
+ },
+ {
+  "query": "a Korean market entry plan",
+  "expect": [
+   "specialized-korean-business-navigator"
+  ]
+ },
+ {
+  "query": "a French consulting proposal",
+  "expect": [
+   "specialized-french-consulting-market"
+  ]
+ },
+ {
+  "query": "live stream product launch plan on Douyin",
+  "expect": [
+   "marketing-douyin-strategist"
+  ]
+ },
+ {
+  "query": "a Weibo campaign for a new product",
+  "expect": [
+   "marketing-weibo-strategist"
+  ]
+ },
+ {
+  "query": "a Xiaohongshu post about skincare",
+  "expect": [
+   "marketing-xiaohongshu-specialist"
+  ]
+ },
+ {
+  "query": "podcast guest outreach plan",
+  "expect": [
+   "marketing-podcast-strategist"
+  ]
+ },
+ {
+  "query": "Reddit community engagement for a developer tool",
+  "expect": [
+   "marketing-reddit-community-builder"
+  ]
+ },
+ {
+  "query": "employees are resisting the new org structure after the merger",
+  "expect": [
+   "change-management-consultant"
+  ]
+ },
+ {
+  "query": "ESG reporting framework for a manufacturer",
+  "expect": [
+   "esg-sustainability-officer"
+  ]
+ },
+ {
+  "query": "customer success playbook for enterprise accounts",
+  "expect": [
+   "customer-success-manager"
+  ]
+ },
+ {
+  "query": "we have duplicate supplier records across systems",
+  "expect": [
+   "data-consolidation-agent"
+  ]
+ },
+ {
+  "query": "match supplier invoices to purchase orders",
+  "expect": [
+   "accounts-payable-agent"
+  ]
+ },
+ {
+  "query": "report distribution to regional managers",
+  "expect": [
+   "report-distribution-agent"
+  ]
+ },
+ {
+  "query": "a checklist for opening the store each morning",
+  "expect": [
+   "operations-manager"
+  ]
+ },
+ {
+  "query": "a lecture on quantitative methods for graduate students",
+  "expect": [
+   "academic-statistician"
+  ]
+ },
+ {
+  "query": "our parcels keep arriving late in the northern region",
+  "expect": [
+   "supply-chain-strategist"
+  ]
+ }
+]

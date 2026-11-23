@@ -25,10 +25,37 @@ benchmarks/
     holdout.json            25 queries (partly used for tuning)
     holdout2.json           20 queries (clean; the honest check)
     project_eval.json       3 projects, 37 subtasks, with expected specialists
+    workflows.json          4 workflows, 30 subtasks (used to diagnose misses, then for picker tests)
+    fresh.json              40 queries, held out (used in Run 17)
+    fresh2.json             40 queries, held out (used in Run 18)
+    fresh3.json             40 queries, held out (used in Run 19; labels committed before any run)
+  experiments/              one-off tests on branches; each has a docstring with its usage
+    prereg_lead.py          pre-registered 2x2 test of the name-view lead (Run 19)
+    rerank_eval.py          cross-encoder reranking of the hybrid's top 15 (Run 12)
+    colbert_core.py, colbert_eval.py   late-interaction (ColBERT) encoder and comparison (Runs 10 and 11)
+    minilm_tuning.py        expanded MiniLM tuning (Run 18)
+    shared_setting_test.py  one shared setting for two models, paired tests (Run 17)
+    cv_hybrid.py, cv_hybrid_wide.py   cross-validated tuning, narrow and wide grids (Runs 15 and 16)
+    tune_hybrid.py          tuning with a train/validation split (Run 14)
+    embed_models.py         six other embedding models in the hybrid (Run 13)
+    bge_compare.py, text_variants.py  bge-small and text variants (Run 9)
   results/
     RESULTS.md              history of every run
+    DECISION-keep-minilm.md why the current model and text were kept
+    DECISION-no-reranker.md why no cross-encoder reranker was adopted (Run 12)
+    DECISION-no-late-interaction.md why late interaction was not adopted (Runs 10 and 11)
     <date>-run.txt          raw output of run_all.sh
+    prereg-2026-11-23.txt   raw output of the pre-registered test (Run 19)
+    picker-2026-11-23.json  subagent picker output, as returned (Run 8)
 ```
+
+## Fresh sets
+
+A fresh set is for testing one candidate once. Write the labels and commit them before any run,
+check every id against the roster, and then do not change them. Once a set has been used to compare
+candidates it is no longer clean for those comparisons. `fresh.json`, `fresh2.json` and `fresh3.json`
+have each been used once, so any new candidate needs a new set. The Run 19 test shows what a
+fresh set can and cannot settle: at 40 queries, differences of a few queries stay inside the noise.
 
 ## Running
 
