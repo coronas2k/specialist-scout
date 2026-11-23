@@ -1,10 +1,19 @@
 {
   "name": "specialist-scout",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Find and run Agency specialists on demand. Keeps the roster out of context and installs it only when you ask.",
-  "author": { "name": "coronas2k", "url": "https://github.com/coronas2k" },
+  "author": {
+    "name": "coronas2k",
+    "url": "https://github.com/coronas2k"
+  },
   "homepage": "https://github.com/coronas2k/specialist-scout",
   "repository": "https://github.com/coronas2k/specialist-scout",
   "license": "MIT",
-  "keywords": ["agents", "subagents", "agency", "roster", "specialists"]
+  "keywords": [
+    "agents",
+    "subagents",
+    "agency",
+    "roster",
+    "specialists"
+  ]
 }

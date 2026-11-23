@@ -48,8 +48,13 @@ Ask for a specialist by role or name:
 - "get the Reality Checker to judge whether this is production ready"
 - "have a frontend developer build the settings page, and a QA specialist test it"
 
-Claude searches the roster, then runs the best match as a subagent. For a whole project, it
-splits the work into subtasks and runs one specialist per subtask.
+Claude writes four short phrases in the words a specialist's job description would use, searches with
+the request and those phrases together, and picks from the merged shortlist of eight. It then runs the
+chosen specialist as a subagent. For a whole project, it splits the work into subtasks and runs one
+specialist per subtask.
+
+On 100 new queries, writing the phrases raised the right pick from 41% to 59%. That figure comes from a
+subagent test, so treat it as an estimate of the effect, not a guarantee.
 
 You can also search from a terminal:
 
