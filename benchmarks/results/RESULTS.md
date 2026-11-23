@@ -293,6 +293,39 @@ vocabulary, not by the choice of embedding model. Script: `benchmarks/experiment
 
 ---
 
+## Run 14: tuning the hybrid per embedding model, with a train/validation split (2026-11-23)
+
+Split: tuning on `eval.json` and `holdout.json` (56 queries); validation on `holdout2.json` and the
+workflows (50 queries). Settings were chosen on the tuning split only, and the grid covered BM25 `k1`
+(0.9, 1.2, 1.6), `b` (0.5, 0.75, 1.0), body weight (0, 0.5, 1), name bonus (0, 5, 10), fusion weight
+(0.5 to 2.0), and two normalisations (`max` as in the plugin, and `minmax`). The harness reproduces the
+plugin's default hybrid: MiniLM at default settings gives 76 first-place and 91 top-three hits across
+all 106 queries.
+
+Validation split (50 queries):
+
+| Model | Settings | hit@1 | hit@3 | MRR |
+|---|---|---|---|---|
+| MiniLM-L6 (current) | default | 29 | 38 | 0.68 |
+| MiniLM-L6 | tuned | 30 | 39 | 0.70 |
+| arctic-embed-xs | default | 28 | 38 | 0.67 |
+| arctic-embed-xs | tuned | 31 | 39 | 0.71 |
+| gte-small | default | 28 | 35 | 0.65 |
+| gte-small | tuned | 31 | 40 | 0.71 |
+
+Tuned settings: MiniLM `k1` 1.6, `b` 0.75, body weight 0.5, name bonus 5, fusion weight 2.0 (max);
+arctic-embed-xs `k1` 1.6, `b` 0.5, body weight 0.5, name bonus 10, fusion weight 2.0 (max); gte-small
+`k1` 1.6, `b` 0.75, body weight 0.5, name bonus 5, fusion weight 0.5 (minmax).
+
+Verdict: tuning gains one to three queries out of 50 on the validation split, which is within noise.
+gte-small tuned is the best validation result (31 and 40, MRR 0.71), one query ahead of tuned MiniLM
+on first place and one on the top three. Three things argue against changing the plugin on this
+evidence alone: the settings differ between models, the best `k1` sits at the edge of the grid, and
+the validation split was used in earlier diagnosis. A fresh labelled set is needed before any change.
+Script: `benchmarks/experiments/tune_hybrid.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
