@@ -1,3 +1,5 @@
+<img src=".claude-plugin/icon.png" alt="Specialist scout icon" width="128">
+
 # Specialist scout plugin for Claude Code
 
 Find and run specialists from [The Agency](https://github.com/msitarzewski/agency-agents)
@@ -76,7 +78,7 @@ Downloads come from these sources only:
 
 ## Context cost
 
-- Always loaded: the skill's one-line description. The search results are added only when you ask for a specialist, about 450 tokens.
+- Always loaded: the skill and setup command descriptions, about 110 tokens. Each search adds about 450 tokens (8 results), and the skill's instructions about 640 tokens, once per conversation when the skill is used.
 - Not shipped: the 282 agent definitions. They stay on disk until searched.
 - Hooks: none. The plugin doesn't run anything at session start.
 
@@ -109,8 +111,9 @@ projects, search one subtask at a time; a single search for a full project cover
 benchmarks/run_all.sh       # every benchmark, saved to benchmarks/results/
 ```
 
-The plugin layout: `.claude-plugin/` (manifests), `skills/specialist-scout/SKILL.md`, `commands/setup.md`,
-`scripts/` (roster search, setup, pinned requirements), `benchmarks/`, `docs/`.
+The plugin layout: `.claude-plugin/` (manifests and the 1024 px `icon.png`), `skills/specialist-scout/SKILL.md`,
+`commands/setup.md`, `scripts/` (roster search, setup, pinned requirements), `benchmarks/`, `docs/`.
+`docs/icon/plugin-icon.svg` is the icon's source. `docs/CONTEXT-COST.md` and `docs/search.md` hold the measurements.
 
 ## Licence
 
