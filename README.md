@@ -63,13 +63,15 @@ python3 -I <plugin folder>/scripts/roster.py show "Reality Checker"
 
 | Item | Where | Size | When |
 |---|---|---|---|
-| Roster (agency-agents) | `$CLAUDE_PLUGIN_DATA/agency-agents` | about 11 MB | `/specialist-scout:setup roster` |
-| Python packages for hybrid search | `$CLAUDE_PLUGIN_DATA/.venv` | about 175 MB | `/specialist-scout:setup embeddings` |
-| Embedding model (all-MiniLM-L6-v2, ONNX file and tokenizer) | `$CLAUDE_PLUGIN_DATA/model` | 90 MB | `/specialist-scout:setup embeddings` |
-| Saved search index | `$CLAUDE_PLUGIN_DATA/index.npz` | 0.5 MB | built on first hybrid search |
+| Roster (agency-agents) | `<data folder>/agency-agents` | about 11 MB | `/specialist-scout:setup roster` |
+| Python packages for hybrid search | `<data folder>/.venv` | about 175 MB | `/specialist-scout:setup embeddings` |
+| Embedding model (all-MiniLM-L6-v2, ONNX file and tokenizer) | `<data folder>/model` | 90 MB | `/specialist-scout:setup embeddings` |
+| Saved search index | `<data folder>/index.npz` | 0.5 MB | built on first hybrid search |
 
-`$CLAUDE_PLUGIN_DATA` is the plugin's own data folder, which survives plugin updates. Uninstalling
-may leave it behind; check it and delete it by hand if you want the space back.
+`<data folder>` is `$CLAUDE_PLUGIN_DATA` when the host sets it. When it does not, which we observed for the
+setup command in a live session, it is `~/.cache/specialist-scout`. Either way the folder is outside the
+plugin's own files, so it survives plugin updates. Uninstalling may leave it behind; check it and delete it by
+hand if you want the space back.
 
 Downloads come from these sources only:
 - `https://github.com/msitarzewski/agency-agents` (the roster)
