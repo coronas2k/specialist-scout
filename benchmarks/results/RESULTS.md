@@ -390,10 +390,10 @@ them, with no exact repeats of earlier queries. Validation: holdout2 and the wor
 
 | Split | Model | First place | Top three | MRR |
 |---|---|---|---|---|
-| Fresh (40) | MiniLM-L6 | 22 | 29 | see paired test |
-| Fresh (40) | arctic-xs (prefix) | 20 | 27 | see paired test |
-| Validation (50) | MiniLM-L6 | 30 | 38 | see paired test |
-| Validation (50) | arctic-xs (prefix) | 31 | 38 | see paired test |
+| Fresh (40) | MiniLM-L6 | 22 | 29 | not reported alone; see the paired difference below |
+| Fresh (40) | arctic-xs (prefix) | 20 | 27 | not reported alone; see the paired difference below |
+| Validation (50) | MiniLM-L6 | 30 | 38 | not reported alone; see the paired difference below |
+| Validation (50) | arctic-xs (prefix) | 31 | 38 | not reported alone; see the paired difference below |
 
 Paired per-query tests (exact McNemar on first-place and top-three outcomes; paired bootstrap, 10,000
 resamples, on the reciprocal-rank difference, arctic minus MiniLM):
