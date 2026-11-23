@@ -9,7 +9,7 @@ so the roster doesn't overload context. Nothing is downloaded until you ask.
 In Claude Code:
 
 ```
-/plugin marketplace add coronas2k/claude-agency-skill
+/plugin marketplace add coronas2k/specialist-scout
 /plugin install specialist-scout@agency-tools
 ```
 

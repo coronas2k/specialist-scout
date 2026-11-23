@@ -3,7 +3,7 @@
 Status: draft for review. Prepared from the licence metadata and file contents available on
 this machine and on GitHub / Hugging Face. This is a technical inventory, not legal advice.
 
-Scope: the code and data in `coronas2k/claude-agency-skill`, the manual skill folder that was
+Scope: the code and data in `coronas2k/specialist-scout`, the manual skill folder that was
 at `~/.claude/skills/agency` (now archived at `~/.claude/archive/agency-manual-2026-11-23`), and everything the plugin downloads or installs.
 
 ## 1. Summary

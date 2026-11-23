@@ -3,6 +3,6 @@
   "version": "0.2.0",
   "description": "Find and run Agency specialists on demand. Keeps the roster out of context and installs it only when you ask.",
   "author": { "name": "coronas2k", "url": "https://github.com/coronas2k" },
-  "repository": "https://github.com/coronas2k/claude-agency-skill",
+  "repository": "https://github.com/coronas2k/specialist-scout",
   "keywords": ["agents", "subagents", "agency", "roster", "specialists"]
 }
