@@ -378,6 +378,47 @@ Script: `benchmarks/experiments/cv_hybrid_wide.py`.
 
 ---
 
+## Run 17: one shared setting, paired tests, and a fresh labelled set (2026-11-23)
+
+Shared setting, chosen on the tuning split (eval and holdout, 56 queries) only, for both models:
+BM25 `k1` 2.0, `b` 0.0, body weight 0.25, name bonus 10, fusion weight 1.5, `max` normalisation. It
+was chosen to maximise the two models' combined top-three hits on the tuning split. On the tuning
+split, MiniLM reaches 48 first and 54 top three, and arctic-embed-xs 48 and 53.
+
+Fresh set (`benchmarks/data/fresh.json`): 40 queries written and id-checked before any model was run on
+them, with no exact repeats of earlier queries. Validation: holdout2 and the workflows (50 queries).
+
+| Split | Model | First place | Top three | MRR |
+|---|---|---|---|---|
+| Fresh (40) | MiniLM-L6 | 22 | 29 | see paired test |
+| Fresh (40) | arctic-xs (prefix) | 20 | 27 | see paired test |
+| Validation (50) | MiniLM-L6 | 30 | 38 | see paired test |
+| Validation (50) | arctic-xs (prefix) | 31 | 38 | see paired test |
+
+Paired per-query tests (exact McNemar on first-place and top-three outcomes; paired bootstrap, 10,000
+resamples, on the reciprocal-rank difference, arctic minus MiniLM):
+
+| Split | First place: arctic-only / MiniLM-only, p | Top three: arctic-only / MiniLM-only, p | Mean reciprocal-rank difference (95% CI) |
+|---|---|---|---|
+| Fresh (40) | 2 / 4, p = 0.69 | 0 / 2, p = 0.50 | -0.041 (-0.114 to +0.025) |
+| Validation (50) | 1 / 0, p = 1.00 | 1 / 1, p = 1.00 | +0.015 (-0.002 to +0.039) |
+| Pooled (90) | 3 / 4, p = 1.00 | 1 / 3, p = 0.63 | -0.010 (-0.045 to +0.022) |
+
+Reference, each model at its own default settings on the fresh set: MiniLM 24 first, 28 top three, MRR
+0.657; arctic 21 first, 27 top three, MRR 0.610. Note that the shared setting costs MiniLM two first-place
+hits on the fresh set compared with its default, which is a further sign that tuned settings do not
+carry over.
+
+Verdict: no evidence that arctic-embed-xs beats MiniLM. Neither model is significantly ahead, and the
+point estimates lean slightly towards MiniLM on the fresh set. The sample is too small to separate
+them: on the fresh set only six queries disagree on first place, and the reciprocal-rank interval
+(-0.11 to +0.03) cannot rule out a difference of about 0.03 in either direction. A larger fresh set would
+be needed to detect a difference of that size.
+
+Script: `benchmarks/experiments/shared_setting_test.py`. Data: `benchmarks/data/fresh.json`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
