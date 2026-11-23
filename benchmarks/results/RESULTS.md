@@ -460,6 +460,45 @@ fresh set. Script: `benchmarks/experiments/minilm_tuning.py`. Data: `benchmarks/
 
 ---
 
+## Run 19: pre-registration, third fresh set and the name-view lead (2026-11-23)
+
+Written before any model is run on `benchmarks/data/fresh3.json` (40 queries, labels committed in
+`bec7ae6` on their own, with no results).
+
+Configurations, fixed in advance (`benchmarks/experiments/prereg_lead.py`):
+
+| Label | Keyword side | Embedding view |
+|---|---|---|
+| A | plugin default: k1 1.2, b 0.75, body weight 0.5, name bonus 5, fusion 1.0 | full text |
+| B | Run 18 keyword side: k1 2.0, b 1.0, body weight 0.25, name bonus 10, fusion 1.5 | full text |
+| C | plugin default keyword side | average of full and name-only |
+| D | Run 18 keyword side | average of full and name-only (the Run 18 setting) |
+
+Primary comparison: D against A, on the pooled fresh2 and fresh3 sets (80 queries). Fresh1 is reported
+as a sensitivity check. Nothing is selected on any of these sets.
+
+Strata, fixed in code: a query is "name-overlap" if a lowercase word of three or more letters, not a
+stopword, appears in the name of an expected specialist; otherwise it is "plain". The name-view lead
+matters most on plain queries, so the plain stratum is the test of it.
+
+Harness check: on fresh2, A must reproduce Run 18 (15 first, 21 top three, MRR 0.464) and D (16, 24,
+0.508). If it does not, nothing is reported.
+
+Decision rule, fixed before the run. The name view is adopted as a candidate only if all three hold:
+
+1. On the pooled 80 queries, the 95% paired-bootstrap interval for the MRR difference D minus A
+   excludes zero (lower bound above zero).
+2. On the plain stratum of the pooled set, D minus A has a positive MRR point estimate.
+3. On the plain stratum of the pooled set, the name-view effect (C minus A) has a positive MRR point
+   estimate.
+
+If rule 1 fails, the lead is not supported. If rule 1 holds but rule 2 or 3 fails, the gain comes from
+name matching the plain queries do not contain, and it is not adopted for them. Adoption also needs the
+user's approval, because it adds a second vector set to the index. No label is edited after results are
+seen; doubtful labels are noted, not changed.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
