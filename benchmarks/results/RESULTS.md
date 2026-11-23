@@ -666,7 +666,7 @@ The earlier 80 to 94% headline figures came from tuned sets. The held-out top-th
 
 Arm B minus arm A: +0.18 (95% paired-bootstrap interval +0.08 to +0.28). Without the five doubtful labels:
 +0.19 (+0.08 to +0.30). All three pre-registered conditions hold, so Arm B is an **adoption candidate**. The
-skill's instructions would change, so adoption needs the user's approval.
+skill's instructions would change, so adoption needs the user's approval. **Adopted 2026-11-23 on the user's approval** (see `DECISION-query-rewriting.md`).
 
 Caveats: 100 queries; the picker and rewriter are subagents, not the main session; the rewriter saw only the
 request text, with no candidates and no labels; the five doubtful labels are kept. The subagents used about 1.1
