@@ -7,10 +7,10 @@ from tokenizers import Tokenizer
 import string
 
 class ColBERT:
-    def __init__(self, folder, query_len=32, doc_len=300, pad_query_with_mask=True, keep_query_mask_positions=True):
+    def __init__(self, folder, model_file='model_int8.onnx', query_len=32, doc_len=300, pad_query_with_mask=True, keep_query_mask_positions=True):
         self.tok = Tokenizer.from_file(f"{folder}/tokenizer.json")
         self.tok.no_padding(); self.tok.no_truncation()
-        self.sess = ort.InferenceSession(f"{folder}/model_int8.onnx", providers=['CPUExecutionProvider'])
+        self.sess = ort.InferenceSession(f"{folder}/{model_file}", providers=['CPUExecutionProvider'])
         self.query_len, self.doc_len = query_len, doc_len
         self.q_id, self.d_id = self.tok.token_to_id('[unused0]'), self.tok.token_to_id('[unused1]')
         self.mask_id = self.tok.token_to_id('[MASK]')
