@@ -499,6 +499,62 @@ seen; doubtful labels are noted, not changed.
 
 ---
 
+### Run 19 results
+
+Raw output: `benchmarks/results/prereg-2026-11-23.txt`. The harness check passed: on fresh2, A gave
+15 / 21 / 0.464 and D gave 16 / 24 / 0.508, the Run 18 numbers.
+
+Third fresh set, 40 queries (18 plain, 22 name-overlap):
+
+| Config | First | Top three | MRR |
+|---|---|---|---|
+| A, plugin default | 23 | 31 | 0.671 |
+| B, Run 18 keyword side | 24 | 31 | 0.691 |
+| C, default keyword side, name view | 23 | 31 | 0.671 |
+| D, Run 18 setting | 23 | 30 | 0.672 |
+
+Primary comparison, D against A (the pre-registered test):
+
+| Set | First (D vs A) | Top three (D vs A) | MRR difference, 95% interval |
+|---|---|---|---|
+| fresh3 (40) | 23 vs 23 | 30 vs 31 | +0.001 (-0.037 to +0.040) |
+| Pooled fresh2 + fresh3 (80) | 39 vs 38 | 54 vs 52 | +0.023 (-0.007 to +0.054) |
+
+Attribution on the pooled 80 (MRR difference, 95% interval): keyword effect with name view (D minus C)
++0.026 (-0.004 to +0.057); keyword effect with full view (B minus A) +0.016 (-0.012 to +0.044); name-view
+effect with default keyword side (C minus A) -0.003 (-0.008 to +0.003); name-view effect with Run 18
+keyword side (D minus B) +0.007 (-0.019 to +0.035).
+
+Strata, pooled 80 (MRR difference, 95% interval):
+
+| Stratum | D minus A | C minus A (name view alone) | B minus A (keyword alone) |
+|---|---|---|---|
+| Plain, 48 queries | +0.023 (-0.021 to +0.069) | -0.007 (-0.016 to -0.001) | +0.011 (-0.030 to +0.050) |
+| Name-overlap, 32 queries | +0.022 (-0.008 to +0.063) | not run | not run |
+
+Sensitivity, adding fresh1 (120 queries): D minus A +0.012 (-0.018 to +0.044).
+
+Decision rule:
+
+1. Pooled interval for D minus A excludes zero: **no** (lower bound -0.007).
+2. Plain-stratum D minus A point estimate positive: **yes** (+0.023), but its interval includes zero.
+3. Plain-stratum name-view effect (C minus A) positive: **no** (-0.007).
+
+Decision: **not supported**. The Run 18 setting is not adopted, and the plugin keeps the current
+MiniLM settings. No second vector set is added.
+
+What this means for the lead. Run 18's gain on fresh2 (one more first place, three more in the top
+three) did not appear on fresh3, where the two settings tie on first place and differ by one in the top
+three. The name view does not help plain queries: alone it slightly lowers MRR there, and that
+interval excludes zero. The rule-3 result was not a pre-registered primary test, so treat the negative
+name-view estimate as exploratory. The pooled gains of about 0.02 MRR are within noise.
+
+Caveats: the sets are 40 queries each, and the labels are mine. Name overlap is a crude proxy for
+role-named queries, and the plain stratum has only 48 queries. The name-view effect on plain queries
+needs a larger set before anyone relies on it.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
