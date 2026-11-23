@@ -419,6 +419,47 @@ Script: `benchmarks/experiments/shared_setting_test.py`. Data: `benchmarks/data/
 
 ---
 
+## Run 18: tuning the MiniLM hybrid further, with a second fresh set (2026-11-23)
+
+Adds two things the earlier grids did not cover: separate field weights for the keyword side (name 3 or
+5, description 2 or 3), and three embedding views per agent (full text, name only, description only),
+combined per query as the full view, the average of full and name, the average of full and description,
+or the maximum of full and name. The grid has 30,720 settings.
+
+Selection on the 106 earlier queries (eval, holdout, holdout2 and the workflows):
+
+| Setting | First place | Top three | MRR |
+|---|---|---|---|
+| Current default | 76 | 91 | 0.796 |
+| Expanded grid, cross-validated | 77 | 92 | 0.807 |
+
+Chosen on all 106: BM25 `k1` 2.0, `b` 1.0, name weight 3, description weight 2, body weight 0.25, name
+bonus 10; fusion weight 1.5 with `max` normalisation; the average of the full and name-only views. Name
+views were chosen in four of five folds, which suggests name-only similarity carries signal the full text
+dilutes.
+
+Fresh set 2 (`benchmarks/data/fresh2.json`, 40 queries, written and id-checked before this run; held out
+and new):
+
+| Setting | First place | Top three | MRR |
+|---|---|---|---|
+| Current default | 15 | 21 | 0.464 |
+| Chosen | 16 | 24 | 0.508 |
+
+Paired tests (exact McNemar; paired bootstrap for the reciprocal-rank difference): first place, chosen-only
+1 and default-only 0, p = 1.00; top three, chosen-only 4 and default-only 1, p = 0.38; MRR difference
++0.045, 95% interval +0.003 to +0.095.
+
+For reference, the first fresh set (seen in Run 17, so not a clean test): default 24 and 28, chosen 22 and 29.
+
+Verdict: a small improvement on new queries, mostly in the top three and in MRR. The interval on MRR
+barely excludes zero, and the top-three result is not significant on 40 queries. The first fresh set
+does not confirm it, and the two fresh sets differ a lot in difficulty (the default manages 15 first-place
+hits on the new set and 24 on the old one). Before adopting the change in the plugin, it needs a third
+fresh set. Script: `benchmarks/experiments/minilm_tuning.py`. Data: `benchmarks/data/fresh2.json`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
