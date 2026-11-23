@@ -351,6 +351,33 @@ Script: `benchmarks/experiments/cv_hybrid.py`.
 
 ---
 
+## Run 16: widened grid, cross-validated, 106 queries (2026-11-23)
+
+Same five-fold protocol as Run 15, with a wider grid: BM25 `k1` 0.6 to 2.4, `b` 0 to 1, body weight 0
+to 1, name bonus 0 to 20, fusion weight 0.25 to 4, and two normalisations. Keyword scores and rank
+metrics are vectorised; the keyword scores match the loop version to rounding error.
+
+| Model | Default: hit@1 / hit@3 / MRR | Widened grid, cross-validated: hit@1 / hit@3 / MRR |
+|---|---|---|
+| MiniLM-L6 (current) | 76 / 91 / 0.80 | 74 / 93 / 0.79 |
+| arctic-embed-xs, with prefix | 75 / 91 / 0.78 | 79 / 92 / 0.82 |
+| arctic-embed-xs, no prefix | 75 / 89 / 0.78 | 78 / 89 / 0.79 |
+| gte-small | 74 / 88 / 0.77 | 77 / 92 / 0.80 |
+| Ensemble (two models) | 75 / 91 / 0.79 | 77 / 92 / 0.81 |
+
+Compared with Run 15 (narrow grid), MiniLM fell from 76 to 74 on first place, and arctic-embed-xs with
+prefix rose from 76 to 79. So the grid choice alone moves these results by two to three queries.
+
+Reading: arctic-embed-xs with its prefix is the first setting in these runs to beat MiniLM on first
+place (by five queries) and on MRR, while trailing by one query in the top three. That is not yet
+established. Arctic's chosen `k1` sat at the new maximum (2.4) in four of five folds, so the grid is
+still too narrow for it, and the chosen settings change from fold to fold. Several queries separate
+the two models, and the difference is smaller than the swing from the grid change. Next steps would
+be a wider `k1` range and a new labelled set.
+Script: `benchmarks/experiments/cv_hybrid_wide.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
