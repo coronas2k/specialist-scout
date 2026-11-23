@@ -266,6 +266,33 @@ yet tested.
 
 ---
 
+## Run 10: late interaction (ColBERT) on all 106 queries (2026-11-23)
+
+Model: `answerdotai/answerai-colbert-small-v1` (Apache-2.0), int8 ONNX, pinned at commit 934fa8bb.
+Encoding rebuilt from its `onnx_config.json` and model card: query marker, 32-position query
+padded with the mask token, document marker, punctuation masking. Checked against the card's
+example: the ranking matches; scores differ by about one point (int8 file versus the card's
+full-precision model). Documents: name, description and vibe (mean 60 tokens, max 248).
+
+| Method | hit@1 (of 106) | hit@3 (of 106) |
+|---|---|---|
+| Keyword (BM25 with name bonus) | 72 | 88 |
+| Late interaction alone | 69 | 81 |
+| Keyword + late interaction, weight 0.5 | 72 | 92 |
+| Keyword + late interaction, weight 1.0 | 74 | 89 |
+| Keyword + late interaction, weight 2.0 | 75 | 88 |
+| Current hybrid (keyword + MiniLM, Run 9) | 76 | 91 |
+| Keyword + MiniLM + late interaction, weight 0.5 (same run as the baseline below) | 74 | 92 |
+| Keyword + MiniLM (same run, min-max scaling) | 75 | 93 |
+
+Verdict: rejected. Late interaction alone beats the MiniLM embeddings at first place (69 against
+64), but it does not improve hybrid search. Adding it to the current hybrid changes hit@3 by one
+query in either direction, which is noise. The reason for the decision is in
+`DECISION-no-late-interaction.md`. Scripts: `benchmarks/experiments/colbert_core.py` and
+`benchmarks/experiments/colbert_eval.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
