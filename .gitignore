@@ -1,0 +1,5 @@
+.venv/
+model/
+index.npz
+__pycache__/
+*.part

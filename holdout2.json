@@ -1,0 +1,137 @@
+[
+ {
+  "query": "reduce bounce rate on our checkout page",
+  "expect": [
+   "marketing-growth-hacker",
+   "engineering-frontend-developer"
+  ]
+ },
+ {
+  "query": "build a React Native app for iOS and Android",
+  "expect": [
+   "engineering-mobile-app-builder"
+  ]
+ },
+ {
+  "query": "set up a CI pipeline in GitHub Actions",
+  "expect": [
+   "engineering-devops-automator",
+   "engineering-git-workflow-master"
+  ]
+ },
+ {
+  "query": "check my code for memory leaks",
+  "expect": [
+   "engineering-senior-developer",
+   "engineering-code-reviewer"
+  ]
+ },
+ {
+  "query": "design a REST API contract with OpenAPI",
+  "expect": [
+   "engineering-api-platform-engineer"
+  ]
+ },
+ {
+  "query": "compliance with SOC 2 controls",
+  "expect": [
+   "security-compliance-auditor",
+   "specialized-fedramp-rmf-compliance"
+  ]
+ },
+ {
+  "query": "write a press release for our product launch",
+  "expect": [
+   "marketing-pr-communications-manager"
+  ]
+ },
+ {
+  "query": "instagram reels strategy for growing followers",
+  "expect": [
+   "marketing-instagram-curator",
+   "marketing-short-video-editing-coach",
+   "marketing-social-media-strategist"
+  ]
+ },
+ {
+  "query": "cold call script for sales reps",
+  "expect": [
+   "sales-outbound-strategist",
+   "sales-coach",
+   "sales-discovery-coach"
+  ]
+ },
+ {
+  "query": "onboard new employees into the company",
+  "expect": [
+   "hr-onboarding"
+  ]
+ },
+ {
+  "query": "vector database for semantic search",
+  "expect": [
+   "engineering-search-relevance-engineer",
+   "engineering-rag-pipeline-engineer"
+  ]
+ },
+ {
+  "query": "Unity multiplayer game networking",
+  "expect": [
+   "unity-multiplayer-engineer"
+  ]
+ },
+ {
+  "query": "estimate the effort for a new feature",
+  "expect": [
+   "product-sprint-prioritizer",
+   "project-management-project-shepherd"
+  ]
+ },
+ {
+  "query": "legal review of a vendor contract",
+  "expect": [
+   "legal-document-review",
+   "support-legal-compliance-checker"
+  ]
+ },
+ {
+  "query": "ethereum token smart contract audit",
+  "expect": [
+   "security-blockchain-security-auditor",
+   "engineering-solidity-smart-contract-engineer"
+  ]
+ },
+ {
+  "query": "track ad spend and conversions on Meta",
+  "expect": [
+   "paid-media-paid-social-strategist",
+   "paid-media-tracking-specialist"
+  ]
+ },
+ {
+  "query": "help a teacher plan a course syllabus",
+  "expect": [
+   "corporate-training-designer",
+   "academic-psychologist"
+  ]
+ },
+ {
+  "query": "write a grant proposal for a nonprofit",
+  "expect": [
+   "grant-writer"
+  ]
+ },
+ {
+  "query": "Wikipedia-style article about a historical event",
+  "expect": [
+   "academic-historian"
+  ]
+ },
+ {
+  "query": "data quality checks on the ETL pipeline",
+  "expect": [
+   "engineering-data-engineer",
+   "engineering-ai-data-remediation-engineer"
+  ]
+ }
+]

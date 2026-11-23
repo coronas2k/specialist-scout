@@ -20,10 +20,12 @@ Search the roster with the bundled script. It prints the id, division, name and 
 description for the best matches:
 
 ```bash
-python3 -I ~/.claude/skills/agency/roster.py search <keywords> [--division <d>] [--limit 8]
+python3 -I ~/.claude/skills/agency/roster.py search <keywords> [--division <d>] [--limit 8] [--mode hybrid|bm25|embed]
 python3 -I ~/.claude/skills/agency/roster.py divisions      # division names and counts
 python3 -I ~/.claude/skills/agency/roster.py show <id-or-name>  # full path of one agent file
 ```
+
+`hybrid` is the default: keyword and embedding scores combined. If the embedding setup is missing, it falls back to `bm25` and prints a one-line note on stderr. Use `--mode bm25` if you want keyword matching only. See `README.md` for setup.
 
 Use words from the role and the task ("seo", "reality check", "unity shader"). If the user
 named the agent, `show` it directly. If two or more candidates fit about equally, pick
