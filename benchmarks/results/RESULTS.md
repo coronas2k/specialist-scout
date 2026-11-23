@@ -266,6 +266,33 @@ yet tested.
 
 ---
 
+## Run 13: six other embedding models in the plugin's hybrid search (2026-11-23)
+
+Each model replaces MiniLM in the plugin's own hybrid search (keyword plus embeddings, the same
+linear blend), on all 106 queries. Each file was checked against its published checksum, and each
+tokenizer against git's blob hash. Pooling and query prefixes follow each model's configuration:
+arctic-embed uses CLS pooling and a query prefix; e5 uses `query:` and `passage:`; nomic uses
+`search_query:` and `search_document:`. The nomic file is the int8 quantised version (137 MB), since
+its fp32 file is 547 MB. Times are on this Mac, CPU only.
+
+| Model | Size | Embedding only, hit@1 / hit@3 | Hybrid, hit@1 / hit@3 | Query time | Index build |
+|---|---|---|---|---|---|
+| MiniLM-L6 (current) | 90 MB | 64 / 82 | 76 / 91 | 1.6 ms | 12 s |
+| arctic-embed-xs | 90 MB | 69 / 86 | 75 / 91 | 2.6 ms | 10 s |
+| arctic-embed-s | 133 MB | 68 / 82 | 76 / 91 | 4.9 ms | 21 s |
+| all-MiniLM-L12-v2 | 133 MB | 67 / 78 | 76 / 91 | 3.7 ms | 21 s |
+| gte-small | 133 MB | 73 / 85 | 74 / 88 | 4.0 ms | 21 s |
+| e5-small-v2 | 133 MB | 71 / 79 | 74 / 90 | 4.4 ms | 22 s |
+| nomic-embed-text-v1.5 (int8) | 137 MB | 61 / 78 | 74 / 89 | 7.7 ms | 542 s |
+
+Verdict: no model improves hybrid search. Several are better on their own: gte-small reaches first
+place on 73 queries, against 64 for MiniLM, and arctic-embed-xs reaches the top three on 86, against
+82. None of that carries into the hybrid, which stays at about 86% in the top three for every model.
+The hybrid is limited by how its parts are combined, and by queries that need meaning rather than
+vocabulary, not by the choice of embedding model. Script: `benchmarks/experiments/embed_models.py`.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
