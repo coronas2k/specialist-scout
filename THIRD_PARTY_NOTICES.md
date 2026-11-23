@@ -10,14 +10,14 @@ meet their licence terms.
 - Source: https://github.com/msitarzewski/agency-agents
 - Licence: MIT
 - Copyright: Copyright (c) 2025 AgentLand Contributors
-- Use: `/agency:setup roster` clones it into the plugin data folder, or the plugin reads an existing clone at `~/.agency-agents`. Not included in this repository.
+- Use: `/specialist-scout:setup roster` clones it into the plugin data folder, or the plugin reads an existing clone at `~/.agency-agents`. Not included in this repository.
 
 ## 2. Embedding model (all-MiniLM-L6-v2)
 
 - Source: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
 - Files used: `onnx/model.onnx` (ONNX file) and `tokenizer.json`, both from the upstream repository at a pinned commit (`1110a243fdf4706b3f48f1d95db1a4f5529b4d41`).
 - Licence: Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0), stated in the upstream model card.
-- Use: `/agency:setup embeddings` downloads them and checks SHA-256 hashes. Not included in this repository.
+- Use: `/specialist-scout:setup embeddings` downloads them and checks SHA-256 hashes. Not included in this repository.
 - Modifications: none. The files are used as published; the plugin applies mean pooling and normalisation in its own code.
 
 ## 3. Python packages

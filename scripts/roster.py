@@ -13,7 +13,7 @@ Modes:
   bm25    keyword ranking only. No dependencies beyond the standard library.
   embed   embedding similarity only.
 
-Roster root: $AGENCY_AGENTS_DIR, else the roster installed by /agency:setup in the
+Roster root: $AGENCY_AGENTS_DIR, else the roster installed by /specialist-scout:setup in the
 plugin data folder, else ~/.agency-agents. The roster is never downloaded here.
 An agent is any .md file inside a division directory (listed in divisions.json)
 whose YAML frontmatter has a `name:` key.
@@ -32,8 +32,8 @@ from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 # Persistent folder for this plugin (survives plugin updates). Outside Claude, fall back to a cache folder.
-DATA_DIR = Path(os.environ.get("CLAUDE_PLUGIN_DATA") or (Path.home() / ".cache" / "agency-skill"))
-VENV_PYTHON = Path(os.environ.get("AGENCY_VENV") or (DATA_DIR / ".venv")) / "bin" / "python"
+DATA_DIR = Path(os.environ.get("CLAUDE_PLUGIN_DATA") or (Path.home() / ".cache" / "specialist-scout"))
+VENV_PYTHON = Path(os.environ.get("SPECIALIST_SCOUT_VENV") or (DATA_DIR / ".venv")) / "bin" / "python"
 MODEL_DIR = DATA_DIR / "model"
 INDEX_PATH = DATA_DIR / "index.npz"
 
@@ -365,11 +365,11 @@ def format_results(results):
 
 def ensure_venv():
     """Re-run this script with the skill's virtualenv, if it exists."""
-    if os.environ.get("AGENCY_NO_REEXEC") or not VENV_PYTHON.exists():
+    if os.environ.get("SPECIALIST_SCOUT_NO_REEXEC") or not VENV_PYTHON.exists():
         return
     if os.path.abspath(sys.executable) == str(VENV_PYTHON.absolute()):
         return
-    os.environ["AGENCY_NO_REEXEC"] = "1"
+    os.environ["SPECIALIST_SCOUT_NO_REEXEC"] = "1"
     os.execv(str(VENV_PYTHON), [str(VENV_PYTHON), str(Path(__file__).resolve()), *sys.argv[1:]])
 
 
@@ -385,7 +385,7 @@ def main(argv):
         return 0 if not bad else 1
 
     if ROOT is None:
-        print("Agency roster not found. Run /agency:setup roster, or set AGENCY_AGENTS_DIR.", file=sys.stderr)
+        print("Agency roster not found. Run /specialist-scout:setup roster, or set AGENCY_AGENTS_DIR.", file=sys.stderr)
         return 3
 
     if cmd == "divisions":

@@ -3,7 +3,7 @@
 # Usage (from anywhere):  benchmarks/run_all.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY="${AGENCY_VENV:-${CLAUDE_PLUGIN_DATA:-$HOME/.cache/agency-skill}/.venv}/bin/python"
+PY="${SPECIALIST_SCOUT_VENV:-${CLAUDE_PLUGIN_DATA:-$HOME/.cache/specialist-scout}/.venv}/bin/python"
 OUT="benchmarks/results/$(date +%Y-%m-%d)-run.txt"
 {
   echo "# search (keyword, embeddings, hybrid) on eval, holdout and holdout2"

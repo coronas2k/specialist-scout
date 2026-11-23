@@ -3,8 +3,8 @@
 Status: draft for review. Prepared from the licence metadata and file contents available on
 this machine and on GitHub / Hugging Face. This is a technical inventory, not legal advice.
 
-Scope: the code and data in `coronas2k/claude-agency-skill`, the skill folder installed at
-`~/.claude/skills/agency`, and everything the plugin downloads or installs.
+Scope: the code and data in `coronas2k/claude-agency-skill`, the manual skill folder that was
+at `~/.claude/skills/agency` (now archived at `~/.claude/archive/agency-manual-2026-11-23`), and everything the plugin downloads or installs.
 
 ## 1. Summary
 
@@ -74,7 +74,7 @@ test queries give the same top-3 results (see `benchmarks/results/RESULTS.md`, R
 | `AmjadShakhshir/awesome-claude-arabic`, `skills/arabic-content-creation.md` | **CC0-1.0** | the `content-creator-ar` skill, installed at `~/.claude/skills/content-creator-ar/` (not part of the plugin) |
 | Benchmark queries and labels in `benchmarks/data/` | ours | written for this project; expected answers are roster IDs |
 | Synonym map, stopword list, BM25 scoring | ours; BM25 is a published algorithm (no licence needed for the method) | `scripts/roster.py` |
-| Setup, roster and search code | ours | `scripts/`, `skills/agency/`, `commands/` |
+| Setup, roster and search code | ours | `scripts/`, `skills/specialist-scout/`, `commands/` |
 
 ## 3. Copying check
 

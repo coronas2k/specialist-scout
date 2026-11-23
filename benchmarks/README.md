@@ -33,7 +33,7 @@ benchmarks/
 Run from the skill folder, with its virtualenv (embedding modes need it):
 
 ```bash
-cd ~/.claude/skills/agency
+cd <plugin folder>
 .venv/bin/python benchmarks/search_eval.py --all            # every set, every mode
 .venv/bin/python benchmarks/search_eval.py holdout2.json --mode hybrid --misses
 .venv/bin/python benchmarks/orchestration_eval.py           # project-level test

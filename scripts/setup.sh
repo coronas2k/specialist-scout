@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Check or install the parts of the Agency plugin that need downloads.
+# Check or install the parts of the specialist scout plugin that need downloads.
 # The embedding model is sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0), ONNX file from its own repository.
 #   setup.sh status       read-only: what is installed (default)
 #   setup.sh roster       clone the agency-agents roster into the plugin data folder
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.cache/agency-skill}"
+DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.cache/specialist-scout}"
 ROSTER_REPO="${AGENCY_ROSTER_REPO:-https://github.com/msitarzewski/agency-agents.git}"
 MODEL_REVISION="1110a243fdf4706b3f48f1d95db1a4f5529b4d41"   # sentence-transformers/all-MiniLM-L6-v2 commit (Apache-2.0)
 MODEL_BASE="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/${MODEL_REVISION}"

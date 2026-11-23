@@ -1,9 +1,9 @@
 ---
-name: agency
-description: Find and run an Agency specialist from the agency-agents roster on demand, without loading the roster into context. Use when the user asks for an Agency agent by name or role ("Reality Checker", "SEO specialist", "unity shader"), says "get/use/activate the <role>", or a task clearly needs a specialist that no installed agent covers. If the roster is not installed, tell the user to run /agency:setup.
+name: specialist-scout
+description: Find and run an Agency specialist from the agency-agents roster on demand, without loading the roster into context. Use when the user asks for an Agency agent by name or role ("Reality Checker", "SEO specialist", "unity shader"), says "get/use/activate the <role>", or a task clearly needs a specialist that no installed agent covers. If the roster is not installed, tell the user to run /specialist-scout:setup.
 ---
 
-# Agency: on-demand specialists
+# Specialist scout: on-demand specialists
 
 The roster has about 280 specialists. Only the search results for the current request
 enter the conversation. Never list or read the whole roster.
@@ -24,7 +24,7 @@ python3 -I "${CLAUDE_PLUGIN_ROOT}/scripts/roster.py" show <id-or-name>
 - If the user named the agent, `show` it directly.
 - `hybrid` is the default. If the embedding setup is missing it falls back to `bm25` and prints a note on stderr. That is fine; keep going.
 - If two candidates fit about equally, pick the closer one. Ask only when the choice changes the outcome.
-- **Exit code 3** means the roster is not installed. Stop, and tell the user to run `/agency:setup roster`. Do not clone or download it yourself.
+- **Exit code 3** means the roster is not installed. Stop, and tell the user to run `/specialist-scout:setup roster`. Do not clone or download it yourself.
 
 Do not open the agent file yourself. The subagent reads it, which keeps this context small.
 
@@ -56,7 +56,7 @@ that did the work.
 
 ## Setup
 
-`/agency:setup` shows what is installed and asks before any download:
+`/specialist-scout:setup` shows what is installed and asks before any download:
 - `roster`: clones the agency-agents roster (about 11 MB) into the plugin data folder.
 - `embeddings`: installs pinned Python packages and a 90 MB model, to enable hybrid search.
 - Keyword search works with the roster alone.

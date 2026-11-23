@@ -85,4 +85,4 @@ $CLAUDE_PLUGIN_DATA/.venv/bin/python benchmarks/orchestration_eval.py   # whole-
 benchmarks/run_all.sh                                                 # everything, saved to benchmarks/results/
 ```
 
-Use the venv created by `/agency:setup embeddings`: embedding modes need it.
+Use the venv created by `/specialist-scout:setup embeddings`: embedding modes need it.

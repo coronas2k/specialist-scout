@@ -4,7 +4,7 @@
   "description": "Agency specialists, loaded on demand.",
   "plugins": [
     {
-      "name": "agency",
+      "name": "specialist-scout",
       "source": "./",
       "description": "Find and run Agency specialists on demand without loading the roster into context."
     }

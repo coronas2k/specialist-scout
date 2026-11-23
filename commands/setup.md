@@ -1,5 +1,5 @@
 ---
-description: Check the Agency plugin and, with your approval, install the roster and optional embedding search
+description: Check the specialist scout plugin and, with your approval, install the roster and optional embedding search
 argument-hint: [status|roster|embeddings|all]
 allowed-tools: Bash
 ---
