@@ -1,6 +1,7 @@
 """Score late-interaction (ColBERT) ranking alone and combined with keyword search on all 106 queries.
 
-Usage: .venv/bin/python benchmarks/experiments/colbert_eval.py <folder with model_int8.onnx and tokenizer.json>
+Usage: .venv/bin/python benchmarks/experiments/colbert_eval.py <folder> [model file, default model_int8.onnx]
+The folder holds tokenizer.json and the model file.
 (answerai-colbert-small-v1, Apache-2.0, pinned at commit 934fa8bb.)
 """
 import json, sys, pathlib
@@ -16,7 +17,9 @@ cases = [c for f in sets.values() for c in f] + [{'query': s['query'], 'expect':
 print('queries:', len(cases))
 
 agents = list(roster.agents())
-m = ColBERT(str(pathlib.Path(sys.argv[1])))
+model_file = sys.argv[2] if len(sys.argv) > 2 else 'model_int8.onnx'
+print('model file:', model_file)
+m = ColBERT(str(pathlib.Path(sys.argv[1])), model_file=model_file)
 docs = [m.encode_doc(roster.embed_text(a)) for a in agents]
 print('doc token counts: mean %.1f max %d' % (np.mean([d.shape[0] for d in docs]), max(d.shape[0] for d in docs)))
 

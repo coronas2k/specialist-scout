@@ -14,8 +14,9 @@ Keep the current hybrid (keyword plus MiniLM embeddings). Do not add `answerai-c
    than MiniLM embeddings alone (69 against 64), but the plugin does not use embeddings alone.
 3. **Cost.** A new 34 MB model, a second index, a new scoring step over token vectors, a new
    third-party notice, and a retest of the whole setup.
-4. **Our checks.** The encoding reproduces the model card's ranking. Its scores are about one point
-   lower because we use the int8 file, not the full-precision model. That does not affect the result.
+4. **Our checks.** The encoding reproduces the model card's ranking. Its scores run about one point
+   low with the int8 file and about 0.6 low with the full-precision file, so quantisation explains part
+   of the gap, not all of it. The verdict is the same with the full-precision model (Run 11).
 
 ## What would change this
 

@@ -293,6 +293,30 @@ query in either direction, which is noise. The reason for the decision is in
 
 ---
 
+## Run 11: full-precision late interaction (fp32), same 106 queries (2026-11-23)
+
+Same model and pinned commit as Run 10, with the full-precision `model.onnx` (133 MB, checksum
+verified) in place of the int8 file.
+
+| Method | int8 hit@1 / hit@3 | fp32 hit@1 / hit@3 |
+|---|---|---|
+| Keyword (BM25 with name bonus) | 72 / 88 | 72 / 88 |
+| Late interaction alone | 69 / 81 | 70 / 81 |
+| Keyword + late interaction, weight 0.5 | 72 / 92 | 72 / 92 |
+| Keyword + late interaction, weight 1.0 | 74 / 89 | 73 / 90 |
+| Keyword + late interaction, weight 2.0 | 75 / 88 | 73 / 88 |
+| Current hybrid (Run 9) | 76 / 91 | 76 / 91 |
+
+Model card example (scores for Venus, Mars, Jupiter, Saturn; the card reports 30.57, 31.49, 31.30,
+31.31): int8 gives 29.66, 30.39, 30.17, 30.24, about one point low; fp32 gives 30.06, 30.80, 30.61,
+30.70, about 0.6 low. Both reproduce the card's ranking. Quantisation explains part of the gap, not
+all of it. The rest is presumably a difference in implementation (for example query padding), which
+was not investigated.
+
+Verdict unchanged: the full-precision model adds nothing to hybrid search.
+
+---
+
 ## Caveats
 
 - **Tuning versus holdout.** `eval.json` was used to choose the weights and synonyms.
